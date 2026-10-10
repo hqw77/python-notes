@@ -37,6 +37,10 @@
     a, b, c = [1, 2, 3]
     head, *tail = [1, 2, 3, 4]    # head=1, tail=[2,3,4]
     *head, tail = [1, 2, 3, 4]    # head=[1,2,3], tail=4
+
+【运行方式】
+  全部: python 05_list_tuple.py
+  单个: python 05_list_tuple.py list_create / list_methods / copy / unpack / tuple / namedtuple
 """
 
 from collections import namedtuple
@@ -45,122 +49,151 @@ import copy
 # ============================================================
 # 1. 列表创建与基本操作
 # ============================================================
-print("--- 列表创建 ---")
-lst1 = [1, 2, 3]
-lst2 = list("abc")          # 从可迭代对象创建
-lst3 = list(range(5))
-print(f"  [1, 2, 3] = {lst1}")
-print(f"  list('abc') = {lst2}")
-print(f"  list(range(5)) = {lst3}")
+def demo_list_create():
+    print("--- 列表创建 ---")
+    lst1 = [1, 2, 3]
+    lst2 = list("abc")          # 从可迭代对象创建
+    lst3 = list(range(5))
+    print(f"  [1, 2, 3] = {lst1}")
+    print(f"  list('abc') = {lst2}")
+    print(f"  list(range(5)) = {lst3}")
 
-print("\n--- 索引与切片 ---")
-print(f"  lst1[0] = {lst1[0]}")
-print(f"  lst1[-1] = {lst1[-1]}")
-print(f"  lst1[1:] = {lst1[1:]}")
-print(f"  lst1[::-1] = {lst1[::-1]}")     # 反转
+    print("\n--- 索引与切片 ---")
+    print(f"  lst1[0] = {lst1[0]}")
+    print(f"  lst1[-1] = {lst1[-1]}")
+    print(f"  lst1[1:] = {lst1[1:]}")
+    print(f"  lst1[::-1] = {lst1[::-1]}")     # 反转
 
 # ============================================================
 # 2. 列表方法
 # ============================================================
-print("\n--- 增删改 ---")
-fruits = ["apple", "banana"]
-fruits.append("orange")              # 尾部追加
-print(f"  append: {fruits}")
-fruits.insert(1, "grape")            # 指定位置插入
-print(f"  insert(1): {fruits}")
-fruits.remove("banana")              # 按值删除 (只删第一个)
-print(f"  remove: {fruits}")
-popped = fruits.pop()                # 按索引删除, 不传参删最后一个; 返回被删的值
-print(f"  pop(): {popped}, 剩下: {fruits}")
-fruits.extend(["kiwi", "mango"])    # 批量追加 (和 append 的区别: append 会把整个列表当一个元素)
-print(f"  extend: {fruits}")
+def demo_list_methods():
+    print("\n--- 增删改 ---")
+    fruits = ["apple", "banana"]
+    fruits.append("orange")              # 尾部追加
+    print(f"  append: {fruits}")
+    fruits.insert(1, "grape")            # 指定位置插入
+    print(f"  insert(1): {fruits}")
+    fruits.remove("banana")              # 按值删除 (只删第一个)
+    print(f"  remove: {fruits}")
+    popped = fruits.pop()                # 按索引删除, 不传参删最后一个; 返回被删的值
+    print(f"  pop(): {popped}, 剩下: {fruits}")
+    fruits.extend(["kiwi", "mango"])    # 批量追加 (和 append 的区别: append 会把整个列表当一个元素)
+    print(f"  extend: {fruits}")
 
-print("\n--- 查找与统计 ---")
-nums = [3, 1, 4, 1, 5]
-print(f"  nums: {nums}")
-print(f"  nums.index(4) = {nums.index(4)}")        # 4 的索引
-print(f"  nums.count(1) = {nums.count(1)}")         # 1 出现了几次
+    print("\n--- 查找与统计 ---")
+    nums = [3, 1, 4, 1, 5]
+    print(f"  nums: {nums}")
+    print(f"  nums.index(4) = {nums.index(4)}")        # 4 的索引
+    print(f"  nums.count(1) = {nums.count(1)}")         # 1 出现了几次
 
-print("\n--- 排序 ---")
-nums.sort()                          # 原地排序
-print(f"  nums.sort(): {nums}")
-nums.sort(reverse=True)              # 降序
-print(f"  nums.sort(reverse=True): {nums}")
+    print("\n--- 排序 ---")
+    nums.sort()                          # 原地排序
+    print(f"  nums.sort(): {nums}")
+    nums.sort(reverse=True)              # 降序
+    print(f"  nums.sort(reverse=True): {nums}")
 
-# sorted() vs list.sort()
-original = [3, 1, 2]
-new = sorted(original)               # 返回新列表, 原列表不变
-print(f"  sorted({original}) = {new}, 原列表不变: {original}")
+    # sorted() vs list.sort()
+    original = [3, 1, 2]
+    new = sorted(original)               # 返回新列表, 原列表不变
+    print(f"  sorted({original}) = {new}, 原列表不变: {original}")
 
 # ============================================================
 # 3. 可变引用与拷贝
 # ============================================================
-print("\n--- 引用陷阱 ---")
-a = [1, 2, 3]
-b = a                                # b 和 a 指向同一个列表
-b.append(4)
-print(f"  a={a}, b={b}  ← 改 b 也改了 a!")
+def demo_copy():
+    print("\n--- 引用陷阱 ---")
+    a = [1, 2, 3]
+    b = a                                # b 和 a 指向同一个列表
+    b.append(4)
+    print(f"  a={a}, b={b}  ← 改 b 也改了 a!")
 
-print("\n--- 浅拷贝 vs 深拷贝 ---")
-a = [[1, 2], [3, 4]]
-b = a.copy()                         # 浅拷贝: 只拷贝外层
-b[0][0] = 99
-print(f"  浅拷贝后改嵌套元素: a={a}, b={b}  ← 内层还是共享的!")
+    print("\n--- 浅拷贝 vs 深拷贝 ---")
+    a = [[1, 2], [3, 4]]
+    b = a.copy()                         # 浅拷贝: 只拷贝外层
+    b[0][0] = 99
+    print(f"  浅拷贝后改嵌套元素: a={a}, b={b}  ← 内层还是共享的!")
 
-a = [[1, 2], [3, 4]]
-c = copy.deepcopy(a)                 # 深拷贝: 外层内层全部复制
-c[0][0] = 99
-print(f"  深拷贝后改嵌套元素: a={a}, c={c}  ← 完全独立!")
+    a = [[1, 2], [3, 4]]
+    c = copy.deepcopy(a)                 # 深拷贝: 外层内层全部复制
+    c[0][0] = 99
+    print(f"  深拷贝后改嵌套元素: a={a}, c={c}  ← 完全独立!")
 
 # ============================================================
 # 4. 拆包 (Unpacking)
 # ============================================================
-print("\n--- 拆包 ---")
-a, b, c = [1, 2, 3]
-print(f"  a,b,c = [1,2,3] → a={a}, b={b}, c={c}")
+def demo_unpack():
+    print("\n--- 拆包 ---")
+    a, b, c = [1, 2, 3]
+    print(f"  a,b,c = [1,2,3] → a={a}, b={b}, c={c}")
 
-# * 收集剩余元素
-head, *tail = [1, 2, 3, 4, 5]
-print(f"  head={head}, tail={tail}")
+    # * 收集剩余元素
+    head, *tail = [1, 2, 3, 4, 5]
+    print(f"  head={head}, tail={tail}")
 
-first, *middle, last = [1, 2, 3, 4, 5]
-print(f"  first={first}, middle={middle}, last={last}")
+    first, *middle, last = [1, 2, 3, 4, 5]
+    print(f"  first={first}, middle={middle}, last={last}")
 
 # ============================================================
 # 5. 元组
 # ============================================================
-print("\n--- 元组 ---")
-t1 = (1, 2, 3)
-t2 = 1, 2, 3           # 括号可省略
-t3 = (42,)             # 单元素元组必须有逗号! (42) 就是 int 了
-print(f"  t1={t1}, t2={t2}, t3={t3}")
-print(f"  type((42)) = {type((42)).__name__}")     # int! 不是 tuple
-print(f"  type((42,)) = {type((42,)).__name__}")   # tuple
+def demo_tuple():
+    print("\n--- 元组 ---")
+    t1 = (1, 2, 3)
+    t2 = 1, 2, 3           # 括号可省略
+    t3 = (42,)             # 单元素元组必须有逗号! (42) 就是 int 了
+    print(f"  t1={t1}, t2={t2}, t3={t3}")
+    print(f"  type((42)) = {type((42)).__name__}")     # int! 不是 tuple
+    print(f"  type((42,)) = {type((42,)).__name__}")   # tuple
 
-# 元组不可变
-try:
-    t1[0] = 99
-except TypeError as e:
-    print(f"  t1[0] = 99 → TypeError: {e}")
+    # 元组不可变
+    try:
+        t1[0] = 99
+    except TypeError as e:
+        print(f"  t1[0] = 99 → TypeError: {e}")
 
-# 元组拆包 (经典用法: 交换变量)
-x, y = 10, 20
-x, y = y, x            # 交换! 右边先创建 tuple (20, 10), 然后拆包
-print(f"  交换后: x={x}, y={y}")
+    # 元组拆包 (经典用法: 交换变量)
+    x, y = 10, 20
+    x, y = y, x            # 交换! 右边先创建 tuple (20, 10), 然后拆包
+    print(f"  交换后: x={x}, y={y}")
 
 # ============================================================
 # 6. namedtuple
 # ============================================================
-print("\n--- namedtuple ---")
-Point = namedtuple("Point", ["x", "y"])
-p = Point(3, 4)
-print(f"  p = {p}")
-print(f"  p.x = {p.x}, p.y = {p.y}")
-print(f"  p[0] = {p[0]}, p[1] = {p[1]}")    # 也能用索引访问
+def demo_namedtuple():
+    print("\n--- namedtuple ---")
+    Point = namedtuple("Point", ["x", "y"])
+    p = Point(3, 4)
+    print(f"  p = {p}")
+    print(f"  p.x = {p.x}, p.y = {p.y}")
+    print(f"  p[0] = {p[0]}, p[1] = {p[1]}")    # 也能用索引访问
 
-# 元组作为 dict key
-d = {p: "坐标点"}
-print(f"  dict key: {d}")
+    # 元组作为 dict key
+    d = {p: "坐标点"}
+    print(f"  dict key: {d}")
+
+# ============================================================
+# 入口: 支持跑全部 / 跑单个
+# ============================================================
+if __name__ == "__main__":
+    import sys
+    demos = {
+        "list_create": demo_list_create,
+        "list_methods": demo_list_methods,
+        "copy": demo_copy,
+        "unpack": demo_unpack,
+        "tuple": demo_tuple,
+        "namedtuple": demo_namedtuple,
+    }
+    if len(sys.argv) > 1:
+        fn = demos.get(sys.argv[1])
+        if fn is None:
+            print(f"未知案例 '{sys.argv[1]}', 可选: {', '.join(demos)}")
+            sys.exit(1)
+        fn()
+    else:
+        for fn in demos.values():
+            fn()
 
 # ============================================================
 # 总结

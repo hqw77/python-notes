@@ -49,13 +49,17 @@
     5. __getattr__ (兜底)
 
   这就是为什么类属性可以被所有实例访问, 但实例属性会覆盖同名类属性.
+
+【运行方式】
+  全部: python 01_class_basic.py
+  单个: python 01_class_basic.py class / attr / private / slots / builtin
 """
+
 
 # ============================================================
 # 1. 类的定义与实例化
 # ============================================================
-print("--- 类与实例 ---")
-
+# Dog 类在第 1、2 节都被用到, 所以放在模块顶层 (demo 函数之前)
 class Dog:
     """一个简单的狗类"""
     species = "犬科"          # 类属性
@@ -71,111 +75,148 @@ class Dog:
     def info(self):
         return f"{self.name}, {self.age}岁, {self.species}"
 
-# 创建实例
+# 创建实例 (dog1/dog2 在第 1、2 节都被用到, 也放在模块顶层)
 dog1 = Dog("旺财", 3)
 dog2 = Dog("来福", 1)
 
-print(f"  dog1: {dog1.info()}")
-print(f"  dog2: {dog2.info()}")
-print(f"  {dog1.bark()}")
+
+def demo_class():
+    print("--- 类与实例 ---")
+    print(f"  dog1: {dog1.info()}")
+    print(f"  dog2: {dog2.info()}")
+    print(f"  {dog1.bark()}")
+
 
 # ============================================================
 # 2. 实例属性 vs 类属性
 # ============================================================
-print("\n--- 实例属性 vs 类属性 ---")
+def demo_attr():
+    print("\n--- 实例属性 vs 类属性 ---")
 
-print(f"  Dog.species = {Dog.species}")       # 类属性
-print(f"  dog1.species = {dog1.species}")     # 通过实例也能访问类属性
+    print(f"  Dog.species = {Dog.species}")       # 类属性
+    print(f"  dog1.species = {dog1.species}")     # 通过实例也能访问类属性
 
-# 修改类属性 → 所有实例都受影响
-Dog.species = "犬科动物"
-print(f"  修改类属性后: dog1={dog1.species}, dog2={dog2.species}")
+    # 修改类属性 → 所有实例都受影响
+    Dog.species = "犬科动物"
+    print(f"  修改类属性后: dog1={dog1.species}, dog2={dog2.species}")
 
-# 修改实例的类属性 → 实际是给实例创建了一个同名实例属性!
-dog1.species = "变异犬"
-print(f"  dog1 改后: dog1.species={dog1.species}, Dog.species={Dog.species}")
-print(f"  dog1.__dict__ = {dog1.__dict__}")   # 能看到 species 出现了
-print(f"  dog2.__dict__ = {dog2.__dict__}")   # 没有 species
+    # 修改实例的类属性 → 实际是给实例创建了一个同名实例属性!
+    dog1.species = "变异犬"
+    print(f"  dog1 改后: dog1.species={dog1.species}, Dog.species={Dog.species}")
+    print(f"  dog1.__dict__ = {dog1.__dict__}")   # 能看到 species 出现了
+    print(f"  dog2.__dict__ = {dog2.__dict__}")   # 没有 species
+
 
 # ============================================================
 # 3. 私有属性 (约定)
 # ============================================================
-print("\n--- 私有属性约定 ---")
+def demo_private():
+    print("\n--- 私有属性约定 ---")
 
-class BankAccount:
-    def __init__(self, owner, balance):
-        self.owner = owner          # 公开属性
-        self._balance = balance     # _ 前缀: "受保护的", 暗示不要直接访问
-        self.__secret = "加密的"    # __ 前缀: 名称改写, 更难从外部访问
+    class BankAccount:
+        def __init__(self, owner, balance):
+            self.owner = owner          # 公开属性
+            self._balance = balance     # _ 前缀: "受保护的", 暗示不要直接访问
+            self.__secret = "加密的"    # __ 前缀: 名称改写, 更难从外部访问
 
-    def deposit(self, amount):
-        self._balance += amount
+        def deposit(self, amount):
+            self._balance += amount
 
-    def get_balance(self):
-        return self._balance
+        def get_balance(self):
+            return self._balance
 
-acc = BankAccount("Alice", 1000)
-print(f"  acc.owner = {acc.owner}")          # 可以访问
-print(f"  acc._balance = {acc._balance}")    # 可以访问, 但 IDE 会警告你
+    acc = BankAccount("Alice", 1000)
+    print(f"  acc.owner = {acc.owner}")          # 可以访问
+    print(f"  acc._balance = {acc._balance}")    # 可以访问, 但 IDE 会警告你
 
-# __ 触发名称改写 (name mangling): __secret → _BankAccount__secret
-# print(acc.__secret)  # AttributeError!
+    # __ 触发名称改写 (name mangling): __secret → _BankAccount__secret
+    # print(acc.__secret)  # AttributeError!
 
-# 推导式拆解: 从 dir(acc) 返回的所有属性名中, 筛选出包含 'secret' 的名字
-# dir(acc) → 返回 acc 所有属性和方法的名称列表
-# [a for a in dir(acc) if 'secret' in a] → 列表推导式: 遍历, 筛选, 收集
-print(f"  改写后的名字: {[a for a in dir(acc) if 'secret' in a]}")
+    # 推导式拆解: 从 dir(acc) 返回的所有属性名中, 筛选出包含 'secret' 的名字
+    # dir(acc) → 返回 acc 所有属性和方法的名称列表
+    # [a for a in dir(acc) if 'secret' in a] → 列表推导式: 遍历, 筛选, 收集
+    print(f"  改写后的名字: {[a for a in dir(acc) if 'secret' in a]}")
 
-# 注意: Python 没有真正的 "私有", __ 只是名字改了, 仍然可以访问
-print(f"  强行访问: {acc._BankAccount__secret}")
+    # 注意: Python 没有真正的 "私有", __ 只是名字改了, 仍然可以访问
+    print(f"  强行访问: {acc._BankAccount__secret}")
+
 
 # ============================================================
 # 4. __slots__ 节省内存
 # ============================================================
-print("\n--- __slots__ ---")
-
+# NormalPerson 在第 4、5 节都被用到, 所以放在模块顶层
 class NormalPerson:
     def __init__(self, name, age):
         self.name = name
         self.age = age
 
-class SlottedPerson:
-    __slots__ = ["name", "age"]      # 只允许这两个属性
-    def __init__(self, name, age):
-        self.name = name
-        self.age = age
 
-np = NormalPerson("Alice", 30)
-sp = SlottedPerson("Bob", 25)
-print(f"  NormalPerson 有 __dict__: {hasattr(np, '__dict__')}")     # True
-print(f"  SlottedPerson 有 __dict__: {hasattr(sp, '__dict__')}")   # False —— 省内存!
+def demo_slots():
+    print("\n--- __slots__ ---")
 
-# __slots__ 的代价: 不能动态添加属性
-# sp.email = "bob@test.com"  # AttributeError!
+    class SlottedPerson:
+        __slots__ = ["name", "age"]      # 只允许这两个属性
+        def __init__(self, name, age):
+            self.name = name
+            self.age = age
+
+    np = NormalPerson("Alice", 30)
+    sp = SlottedPerson("Bob", 25)
+    print(f"  NormalPerson 有 __dict__: {hasattr(np, '__dict__')}")     # True
+    print(f"  SlottedPerson 有 __dict__: {hasattr(sp, '__dict__')}")   # False —— 省内存!
+
+    # __slots__ 的代价: 不能动态添加属性
+    # sp.email = "bob@test.com"  # AttributeError!
+
 
 # ============================================================
 # 5. 内置工具函数 —— 运行时动态操作对象
 # ============================================================
-print("\n--- 内置工具 ---")
+def demo_builtin():
+    print("\n--- 内置工具 ---")
 
-p = NormalPerson("Charlie", 25)
+    p = NormalPerson("Charlie", 25)
 
-# type(obj) → 返回对象的类 (这个对象是哪个类造出来的?)
-print(f"  type(p) = {type(p)}")       # <class 'NormalPerson'>
+    # type(obj) → 返回对象的类 (这个对象是哪个类造出来的?)
+    print(f"  type(p) = {type(p)}")       # <class 'NormalPerson'>
 
-# isinstance(obj, Class) → 检查 obj 是不是 Class 的实例 (支持继承!)
-# isinstance 比 type(obj) == Class 更好, 因为它会检查整条继承链
-print(f"  isinstance(p, NormalPerson) = {isinstance(p, NormalPerson)}")  # True
-print(f"  isinstance(p, object) = {isinstance(p, object)}")     # True —— 一切皆是 object
+    # isinstance(obj, Class) → 检查 obj 是不是 Class 的实例 (支持继承!)
+    # isinstance 比 type(obj) == Class 更好, 因为它会检查整条继承链
+    print(f"  isinstance(p, NormalPerson) = {isinstance(p, NormalPerson)}")  # True
+    print(f"  isinstance(p, object) = {isinstance(p, object)}")     # True —— 一切皆是 object
 
-# hasattr(obj, '属性名') → 检查对象有没有这个属性
-print(f"  hasattr(p, 'name'): {hasattr(p, 'name')}")     # True
-print(f"  hasattr(p, 'email'): {hasattr(p, 'email')}")   # False
+    # hasattr(obj, '属性名') → 检查对象有没有这个属性
+    print(f"  hasattr(p, 'name'): {hasattr(p, 'name')}")     # True
+    print(f"  hasattr(p, 'email'): {hasattr(p, 'email')}")   # False
 
-# getattr(obj, '属性名'[, 默认值]) → 安全地获取属性值
-# 如果属性存在 → 返回属性值; 如果不存在 → 返回默认值 (不写默认值则抛异常)
-print(f"  getattr(p, 'name'): {getattr(p, 'name')}")             # 'Charlie'
-print(f"  getattr(p, 'email', '未设置'): {getattr(p, 'email', '未设置')}")  # '未设置'
+    # getattr(obj, '属性名'[, 默认值]) → 安全地获取属性值
+    # 如果属性存在 → 返回属性值; 如果不存在 → 返回默认值 (不写默认值则抛异常)
+    print(f"  getattr(p, 'name'): {getattr(p, 'name')}")             # 'Charlie'
+    print(f"  getattr(p, 'email', '未设置'): {getattr(p, 'email', '未设置')}")  # '未设置'
+
+
+# ============================================================
+# 入口: 支持跑全部 / 跑单个
+# ============================================================
+if __name__ == "__main__":
+    import sys
+    demos = {
+        "class": demo_class,
+        "attr": demo_attr,
+        "private": demo_private,
+        "slots": demo_slots,
+        "builtin": demo_builtin,
+    }
+    if len(sys.argv) > 1:
+        fn = demos.get(sys.argv[1])
+        if fn is None:
+            print(f"未知案例 '{sys.argv[1]}', 可选: {', '.join(demos)}")
+            sys.exit(1)
+        fn()
+    else:
+        for fn in demos.values():
+            fn()
+
 
 # ============================================================
 # 总结

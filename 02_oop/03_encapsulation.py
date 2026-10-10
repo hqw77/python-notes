@@ -29,137 +29,172 @@
 
   但不要过度使用: 如果只是简单的 get/set, 没有验证逻辑,
   直接暴露属性名更好 (Pythonic).
+
+【运行方式】
+  全部: python 03_encapsulation.py
+  单个: python 03_encapsulation.py underscore / property / property_func / backcompat
 """
+
 
 # ============================================================
 # 1. 封装约定: _ 和 __
 # ============================================================
-print("--- 封装约定 ---")
+def demo_underscore():
+    print("--- 封装约定 ---")
 
-class Employee:
-    def __init__(self, name, salary):
-        self.name = name            # 公开: 随便访问
-        self._department = "技术部"  # 受保护: 暗示不要直接访问
-        self.__salary = salary      # 私有: 名称改写
+    class Employee:
+        def __init__(self, name, salary):
+            self.name = name            # 公开: 随便访问
+            self._department = "技术部"  # 受保护: 暗示不要直接访问
+            self.__salary = salary      # 私有: 名称改写
 
-    def get_salary(self):
-        return self.__salary
+        def get_salary(self):
+            return self.__salary
 
-    def set_salary(self, value):
-        if value > 0:
-            self.__salary = value
+        def set_salary(self, value):
+            if value > 0:
+                self.__salary = value
 
-emp = Employee("Alice", 10000)
-print(f"  name (公开): {emp.name}")
-print(f"  _department: {emp._department}")     # 能访问, IDE 会提示
-print(f"  get_salary(): {emp.get_salary()}")
-# print(emp.__salary)                          # AttributeError!
-print(f"  实际存储名为: {[a for a in dir(emp) if 'salary' in a]}")
+    emp = Employee("Alice", 10000)
+    print(f"  name (公开): {emp.name}")
+    print(f"  _department: {emp._department}")     # 能访问, IDE 会提示
+    print(f"  get_salary(): {emp.get_salary()}")
+    # print(emp.__salary)                          # AttributeError!
+    print(f"  实际存储名为: {[a for a in dir(emp) if 'salary' in a]}")
+
 
 # ============================================================
 # 2. @property 基础
 # ============================================================
-print("\n--- @property ---")
+def demo_property():
+    print("\n--- @property ---")
 
-class Circle:
-    def __init__(self, radius):
-        self._radius = radius       # 内部存储用 _radius
+    class Circle:
+        def __init__(self, radius):
+            self._radius = radius       # 内部存储用 _radius
 
-    @property                       # getter: c.radius 看起来像直接读属性
-    def radius(self):
-        """半径 —— 可读可写"""
-        return self._radius
+        @property                       # getter: c.radius 看起来像直接读属性
+        def radius(self):
+            """半径 —— 可读可写"""
+            return self._radius
 
-    @radius.setter                  # setter: c.radius = 5 触发这个方法
-    def radius(self, value):
-        if value < 0:
-            raise ValueError("半径不能为负数")
-        self._radius = value
+        @radius.setter                  # setter: c.radius = 5 触发这个方法
+        def radius(self, value):
+            if value < 0:
+                raise ValueError("半径不能为负数")
+            self._radius = value
 
-    @radius.deleter                 # deleter: del c.radius 触发
-    def radius(self):
-        print("  重置半径为 0")
-        self._radius = 0
+        @radius.deleter                 # deleter: del c.radius 触发
+        def radius(self):
+            print("  重置半径为 0")
+            self._radius = 0
 
-    @property                       # 只读属性 (只有 getter, 没有 setter)
-    def area(self):
-        """面积 = πr^2 — 只读"""
-        return 3.14159 * self._radius ** 2
+        @property                       # 只读属性 (只有 getter, 没有 setter)
+        def area(self):
+            """面积 = πr^2 — 只读"""
+            return 3.14159 * self._radius ** 2
 
-    @property
-    def diameter(self):
-        """直径 = 2r — 只读"""
-        return 2 * self._radius
+        @property
+        def diameter(self):
+            """直径 = 2r — 只读"""
+            return 2 * self._radius
 
-c = Circle(5)
-print(f"  半径: {c.radius}")           # c.radius (看起来是属性, 实际调了 getter)
-print(f"  面积: {c.area:.2f}")         # 只读计算属性
-print(f"  直径: {c.diameter:.2f}")
-c.radius = 10                          # 调 setter, 会做验证
-print(f"  修改后: 半径={c.radius}, 面积={c.area:.2f}")
+    c = Circle(5)
+    print(f"  半径: {c.radius}")           # c.radius (看起来是属性, 实际调了 getter)
+    print(f"  面积: {c.area:.2f}")         # 只读计算属性
+    print(f"  直径: {c.diameter:.2f}")
+    c.radius = 10                          # 调 setter, 会做验证
+    print(f"  修改后: 半径={c.radius}, 面积={c.area:.2f}")
 
-try:
-    c.radius = -5
-except ValueError as e:
-    print(f"  验证生效: {e}")
+    try:
+        c.radius = -5
+    except ValueError as e:
+        print(f"  验证生效: {e}")
 
-# c.area = 100  # AttributeError! 只读属性不能赋值
+    # c.area = 100  # AttributeError! 只读属性不能赋值
+
 
 # ============================================================
 # 3. property() 函数写法 (等价于 @property 装饰器)
 # ============================================================
-print("\n--- property() 函数写法 ---")
+def demo_property_func():
+    print("\n--- property() 函数写法 ---")
 
-class Rectangle:
-    def __init__(self, width, height):
-        self._width = width
-        self._height = height
+    class Rectangle:
+        def __init__(self, width, height):
+            self._width = width
+            self._height = height
 
-    def get_width(self):
-        return self._width
+        def get_width(self):
+            return self._width
 
-    def set_width(self, value):
-        if value <= 0:
-            raise ValueError("宽度必须大于 0")
-        self._width = value
+        def set_width(self, value):
+            if value <= 0:
+                raise ValueError("宽度必须大于 0")
+            self._width = value
 
-    # property(fget, fset, fdel, doc)
-    width = property(get_width, set_width, None, "矩形的宽度")
+        # property(fget, fset, fdel, doc)
+        width = property(get_width, set_width, None, "矩形的宽度")
 
-r = Rectangle(10, 5)
-print(f"  r.width = {r.width}")
-r.width = 20
-print(f"  r.width = {r.width}")
+    r = Rectangle(10, 5)
+    print(f"  r.width = {r.width}")
+    r.width = 20
+    print(f"  r.width = {r.width}")
+
 
 # ============================================================
 # 4. 直接从公开属性改为 @property (向后兼容)
 # ============================================================
-print("\n--- 向后兼容示例 ---")
+def demo_backcompat():
+    print("\n--- 向后兼容示例 ---")
 
-# 假设 v1.0: 直接暴露属性
-# class Product:
-#     def __init__(self, price):
-#         self.price = price
+    # 假设 v1.0: 直接暴露属性
+    # class Product:
+    #     def __init__(self, price):
+    #         self.price = price
 
-# v2.0: 想加验证, 用 @property 包装, 外部代码不需要改!
-class Product:
-    def __init__(self, price):
-        self._price = price
+    # v2.0: 想加验证, 用 @property 包装, 外部代码不需要改!
+    class Product:
+        def __init__(self, price):
+            self._price = price
 
-    @property
-    def price(self):
-        return self._price
+        @property
+        def price(self):
+            return self._price
 
-    @price.setter
-    def price(self, value):
-        if value < 0:
-            raise ValueError("价格不能为负")
-        self._price = value
+        @price.setter
+        def price(self, value):
+            if value < 0:
+                raise ValueError("价格不能为负")
+            self._price = value
 
-p = Product(99.9)
-print(f"  p.price = {p.price}")
-p.price = 199.9                        # 外部调用方式不变!
-print(f"  p.price = {p.price}")
+    p = Product(99.9)
+    print(f"  p.price = {p.price}")
+    p.price = 199.9                        # 外部调用方式不变!
+    print(f"  p.price = {p.price}")
+
+
+# ============================================================
+# 入口: 支持跑全部 / 跑单个
+# ============================================================
+if __name__ == "__main__":
+    import sys
+    demos = {
+        "underscore": demo_underscore,
+        "property": demo_property,
+        "property_func": demo_property_func,
+        "backcompat": demo_backcompat,
+    }
+    if len(sys.argv) > 1:
+        fn = demos.get(sys.argv[1])
+        if fn is None:
+            print(f"未知案例 '{sys.argv[1]}', 可选: {', '.join(demos)}")
+            sys.exit(1)
+        fn()
+    else:
+        for fn in demos.values():
+            fn()
+
 
 # ============================================================
 # 总结

@@ -84,195 +84,231 @@
   什么时候用哪个?
     - 需要多次遍历, 随机访问 → 列表
     - 只需要遍历一次, 或数据很大 → 生成器
+
+【运行方式】
+  全部: python 09_generator_advanced.py
+  单个: python 09_generator_advanced.py yield_from / yield_from_channel / send / pipeline / throw / close / genexpr
 """
+
+import sys
 
 # ============================================================
 # 1. yield from —— 委托给子生成器
 # ============================================================
-# 不用 yield from: 手动迭代子生成器
-def flatten_manual(nested):
-    """展开嵌套列表（手动版）"""
-    for sublist in nested:
-        for item in sublist:
-            yield item
+def demo_yield_from():
+    # 不用 yield from: 手动迭代子生成器
+    def flatten_manual(nested):
+        """展开嵌套列表（手动版）"""
+        for sublist in nested:
+            for item in sublist:
+                yield item
 
-# 用 yield from: 把迭代委托出去
-def flatten_yieldfrom(nested):
-    """展开嵌套列表（yield from 版）"""
-    for sublist in nested:
-        yield from sublist     # 等价于 for x in sublist: yield x，但更高效
+    # 用 yield from: 把迭代委托出去
+    def flatten_yieldfrom(nested):
+        """展开嵌套列表（yield from 版）"""
+        for sublist in nested:
+            yield from sublist     # 等价于 for x in sublist: yield x，但更高效
 
-print("--- yield from ---")
-nested = [[1, 2], [3, 4], [5, 6]]
-print(f"  手动版: {list(flatten_manual(nested))}")
-print(f"  yield from 版: {list(flatten_yieldfrom(nested))}")
+    print("--- yield from ---")
+    nested = [[1, 2], [3, 4], [5, 6]]
+    print(f"  手动版: {list(flatten_manual(nested))}")
+    print(f"  yield from 版: {list(flatten_yieldfrom(nested))}")
 
-# yield from 的真正威力：可以委托给任何可迭代对象（生成器、列表、迭代器）
-def chain(*iterables):
-    """把多个可迭代对象串在一起（类似 itertools.chain）"""
-    for it in iterables:
-        yield from it
+    # yield from 的真正威力：可以委托给任何可迭代对象（生成器、列表、迭代器）
+    def chain(*iterables):
+        """把多个可迭代对象串在一起（类似 itertools.chain）"""
+        for it in iterables:
+            yield from it
 
-print(f"  串联: {list(chain('AB', 'CD', [1, 2]))}")   # ['A', 'B', 'C', 'D', 1, 2]
+    print(f"  串联: {list(chain('AB', 'CD', [1, 2]))}")   # ['A', 'B', 'C', 'D', 1, 2]
 
 
 # ============================================================
 # 2. yield from 的完整功能 —— 双向通道
 # ============================================================
-# yield from 不只是"自动 for 循环"，它建立了一个双向通道：
-#   调用方的 send()/throw()/close() 会透传给子生成器
+def demo_yield_from_channel():
+    # yield from 不只是"自动 for 循环"，它建立了一个双向通道：
+    #   调用方的 send()/throw()/close() 会透传给子生成器
 
-def sub_generator():
-    """子生成器：接收值并处理"""
-    total = 0
-    while True:
-        received = yield                    # yield 右边没有值，接收 send 传来的值
-        if received is None:
-            break
-        print(f"    子生成器收到: {received}")
-        total += received
-    return total                            # return 的值会被 yield from 捕获！
+    def sub_generator():
+        """子生成器：接收值并处理"""
+        total = 0
+        while True:
+            received = yield                    # yield 右边没有值，接收 send 传来的值
+            if received is None:
+                break
+            print(f"    子生成器收到: {received}")
+            total += received
+        return total                            # return 的值会被 yield from 捕获！
 
-def delegator():
-    """委托生成器：用 yield from 委托给子生成器"""
-    print("  委托开始")
-    result = yield from sub_generator()     # yield from 会捕获子生成器的 return 值
-    print(f"  委托结束，子生成器返回: {result}")
-    yield result
+    def delegator():
+        """委托生成器：用 yield from 委托给子生成器"""
+        print("  委托开始")
+        result = yield from sub_generator()     # yield from 会捕获子生成器的 return 值
+        print(f"  委托结束，子生成器返回: {result}")
+        yield result
 
-print("\n--- yield from 双向通道 ---")
-d = delegator()
-next(d)                          # 启动，执行到子生成器的 yield
-d.send(10)
-d.send(20)
-d.send(30)
-try:
-    d.send(None)                 # 发送 None 让子生成器 break
-except StopIteration as e:
-    print(f"  最终结果: {e.value}")
+    print("\n--- yield from 双向通道 ---")
+    d = delegator()
+    next(d)                          # 启动，执行到子生成器的 yield
+    d.send(10)
+    d.send(20)
+    d.send(30)
+    try:
+        d.send(None)                 # 发送 None 让子生成器 break
+    except StopIteration as e:
+        print(f"  最终结果: {e.value}")
 
 
 # ============================================================
 # 3. send() —— 向生成器发送值（协程基础）
 # ============================================================
-def accumulator():
-    """累加器 —— 每次 send 一个值，内部累加"""
-    total = 0
-    while True:
-        value = yield total      # 先 yield 当前 total，然后接收 send 来的值
-        if value is None:
-            continue
-        total += value
+def demo_send():
+    def accumulator():
+        """累加器 —— 每次 send 一个值，内部累加"""
+        total = 0
+        while True:
+            value = yield total      # 先 yield 当前 total，然后接收 send 来的值
+            if value is None:
+                continue
+            total += value
 
-print("\n--- send() 发送值 ---")
-acc = accumulator()
-print(f"  启动: {next(acc)}")            # 必须先 next() 启动，执行到 yield，返回 0
-print(f"  send(5): {acc.send(5)}")       # 发送 5，累加后返回 5
-print(f"  send(10): {acc.send(10)}")     # 发送 10，累加后返回 15
-print(f"  send(3): {acc.send(3)}")       # 发送 3，累加后返回 18
+    print("\n--- send() 发送值 ---")
+    acc = accumulator()
+    print(f"  启动: {next(acc)}")            # 必须先 next() 启动，执行到 yield，返回 0
+    print(f"  send(5): {acc.send(5)}")       # 发送 5，累加后返回 5
+    print(f"  send(10): {acc.send(10)}")     # 发送 10，累加后返回 15
+    print(f"  send(3): {acc.send(3)}")       # 发送 3，累加后返回 18
 
-# send() 的本质：
-#   yield 是一个表达式，可以接收值
-#   value = yield output
-#   ↑         ↑
-#   接收值    产出值
+    # send() 的本质：
+    #   yield 是一个表达式，可以接收值
+    #   value = yield output
+    #   ↑         ↑
+    #   接收值    产出值
 
 
 # ============================================================
 # 4. 协程流水线 —— 生成器的实际应用
 # ============================================================
-def reader(filename):
-    """读取文件，逐行 send 给下游"""
-    lines = [
-        "apple 3",
-        "banana 5",
-        "apple 2",
-        "orange 7",
-        "banana 1",
-    ]
-    for line in lines:
-        yield line
+def demo_pipeline():
+    def reader(filename):
+        """读取文件，逐行 send 给下游"""
+        lines = [
+            "apple 3",
+            "banana 5",
+            "apple 2",
+            "orange 7",
+            "banana 1",
+        ]
+        for line in lines:
+            yield line
 
-def parser(lines):
-    """解析行，输出 (key, value) 元组"""
-    for line in lines:
-        fruit, count = line.split()
-        yield fruit, int(count)
+    def parser(lines):
+        """解析行，输出 (key, value) 元组"""
+        for line in lines:
+            fruit, count = line.split()
+            yield fruit, int(count)
 
-def grouper(parsed):
-    """按 key 分组聚合"""
-    result = {}
-    for fruit, count in parsed:
-        result[fruit] = result.get(fruit, 0) + count
-    yield result
+    def grouper(parsed):
+        """按 key 分组聚合"""
+        result = {}
+        for fruit, count in parsed:
+            result[fruit] = result.get(fruit, 0) + count
+        yield result
 
-print("\n--- 生成器流水线 ---")
-# 像管道一样串联
-pipeline = grouper(parser(reader("data.txt")))
-print(f"  流水线结果: {next(pipeline)}")
+    print("\n--- 生成器流水线 ---")
+    # 像管道一样串联
+    pipeline = grouper(parser(reader("data.txt")))
+    print(f"  流水线结果: {next(pipeline)}")
 
-# 等价于手写：
-# result = {}
-# for fruit, count in parser(reader("data.txt")):
-#     result[fruit] = result.get(fruit, 0) + count
-# 但生成器版本的好处是：可以处理无限数据、内存友好
+    # 等价于手写：
+    # result = {}
+    # for fruit, count in parser(reader("data.txt")):
+    #     result[fruit] = result.get(fruit, 0) + count
+    # 但生成器版本的好处是：可以处理无限数据、内存友好
 
 
 # ============================================================
 # 5. throw() —— 向生成器内部抛异常
 # ============================================================
-def exception_handler():
-    """展示生成器如何处理异常"""
-    try:
-        while True:
-            try:
-                x = yield
-                print(f"    收到: {x}")
-            except ValueError as e:
-                print(f"    捕获 ValueError: {e}")
-    finally:
-        print("    生成器清理中...")
+def demo_throw():
+    def exception_handler():
+        """展示生成器如何处理异常"""
+        try:
+            while True:
+                try:
+                    x = yield
+                    print(f"    收到: {x}")
+                except ValueError as e:
+                    print(f"    捕获 ValueError: {e}")
+        finally:
+            print("    生成器清理中...")
 
-print("\n--- throw() 抛异常 ---")
-gen = exception_handler()
-next(gen)
-gen.send("正常数据")
-gen.throw(ValueError, "模拟错误")    # 向生成器内部抛异常，生成器可以捕获
-gen.send("继续工作")                # 生成器还活着！
+    print("\n--- throw() 抛异常 ---")
+    gen = exception_handler()
+    next(gen)
+    gen.send("正常数据")
+    gen.throw(ValueError, "模拟错误")    # 向生成器内部抛异常，生成器可以捕获
+    gen.send("继续工作")                # 生成器还活着！
 
 
 # ============================================================
 # 6. close() —— 关闭生成器
 # ============================================================
-def closeable_gen():
-    try:
-        for i in range(5):
-            yield i
-    finally:
-        print("  生成器被关闭，清理资源")
+def demo_close():
+    def closeable_gen():
+        try:
+            for i in range(5):
+                yield i
+        finally:
+            print("  生成器被关闭，清理资源")
 
-print("\n--- close() 关闭 ---")
-gen = closeable_gen()
-print(f"  next: {next(gen)}")    # 0
-gen.close()                      # 在 yield 处抛出 GeneratorExit，触发 finally
-# 之后再调用 gen 会抛 StopIteration
+    print("\n--- close() 关闭 ---")
+    gen = closeable_gen()
+    print(f"  next: {next(gen)}")    # 0
+    gen.close()                      # 在 yield 处抛出 GeneratorExit，触发 finally
+    # 之后再调用 gen 会抛 StopIteration
 
 
 # ============================================================
 # 7. 生成器表达式 vs 列表推导式
 # ============================================================
-import sys
+def demo_genexpr():
+    # 列表推导式：一次性生成所有元素，占用内存
+    list_comp = [x ** 2 for x in range(1000000)]
+    # 生成器表达式：惰性生成，几乎不占内存
+    gen_expr = (x ** 2 for x in range(1000000))
 
-# 列表推导式：一次性生成所有元素，占用内存
-list_comp = [x ** 2 for x in range(1000000)]
-# 生成器表达式：惰性生成，几乎不占内存
-gen_expr = (x ** 2 for x in range(1000000))
+    # 比较内存占用
+    print(f"\n--- 内存对比 ---")
+    print(f"  列表推导式: {sys.getsizeof(list_comp)} 字节 (不包含元素)")
+    print(f"  生成器表达式: {sys.getsizeof(gen_expr)} 字节")
+    # 列表的 1M 个元素存在内存中，生成器只是"知道怎么算"
 
-# 比较内存占用
-print(f"\n--- 内存对比 ---")
-print(f"  列表推导式: {sys.getsizeof(list_comp)} 字节 (不包含元素)")
-print(f"  生成器表达式: {sys.getsizeof(gen_expr)} 字节")
-# 列表的 1M 个元素存在内存中，生成器只是"知道怎么算"
+
+# ============================================================
+# 入口: 支持跑全部 / 跑单个
+# ============================================================
+if __name__ == "__main__":
+    import sys
+    demos = {
+        "yield_from": demo_yield_from,
+        "yield_from_channel": demo_yield_from_channel,
+        "send": demo_send,
+        "pipeline": demo_pipeline,
+        "throw": demo_throw,
+        "close": demo_close,
+        "genexpr": demo_genexpr,
+    }
+    if len(sys.argv) > 1:
+        fn = demos.get(sys.argv[1])
+        if fn is None:
+            print(f"未知案例 '{sys.argv[1]}', 可选: {', '.join(demos)}")
+            sys.exit(1)
+        fn()
+    else:
+        for fn in demos.values():
+            fn()
 
 
 # ============================================================

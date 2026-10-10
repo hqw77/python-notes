@@ -32,6 +32,10 @@
   从 Python 3.7 开始, dict 保证按插入顺序迭代.
   这是 CPython 3.6 的实现细节升级为语言保证.
   不需要 OrderedDict 了 (除非你需要按 key 移动顺序).
+
+【运行方式】
+  全部: python 06_dict_set.py
+  单个: python 06_dict_set.py dict_create / get / dict_methods / merge / defaultdict / set
 """
 
 from collections import defaultdict
@@ -39,131 +43,160 @@ from collections import defaultdict
 # ============================================================
 # 1. 字典创建与基本操作
 # ============================================================
-print("--- 字典创建 ---")
-d1 = {"a": 1, "b": 2}
-d2 = dict(a=1, b=2)
-d3 = dict([("a", 1), ("b", 2)])
-print(f"  d1 = {d1}")
-print(f"  d2 = {d2}")
-print(f"  d3 = {d3}")
+def demo_dict_create():
+    print("--- 字典创建 ---")
+    d1 = {"a": 1, "b": 2}
+    d2 = dict(a=1, b=2)
+    d3 = dict([("a", 1), ("b", 2)])
+    print(f"  d1 = {d1}")
+    print(f"  d2 = {d2}")
+    print(f"  d3 = {d3}")
 
-print("\n--- 基本操作 ---")
-d = {"name": "Alice", "age": 30}
-d["city"] = "Beijing"              # 新增
-d["age"] = 31                       # 修改
-print(f"  新增/修改后: {d}")
-del d["city"]                        # 删除
-print(f"  删除 city 后: {d}")
+    print("\n--- 基本操作 ---")
+    d = {"name": "Alice", "age": 30}
+    d["city"] = "Beijing"              # 新增
+    d["age"] = 31                       # 修改
+    print(f"  新增/修改后: {d}")
+    del d["city"]                        # 删除
+    print(f"  删除 city 后: {d}")
 
 # ============================================================
 # 2. 安全取值: get() vs []
 # ============================================================
-print("\n--- 安全取值 ---")
-user = {"name": "Bob"}
-# print(user["age"])    # KeyError! 程序崩溃
-age = user.get("age")        # 返回 None, 不报错
-age_default = user.get("age", 0)  # 如果不存在, 返回默认值 0
-print(f"  get('age') = {age}")
-print(f"  get('age', 0) = {age_default}")
-print(f"  get('name') = {user.get('name')}")
+def demo_get():
+    print("\n--- 安全取值 ---")
+    user = {"name": "Bob"}
+    # print(user["age"])    # KeyError! 程序崩溃
+    age = user.get("age")        # 返回 None, 不报错
+    age_default = user.get("age", 0)  # 如果不存在, 返回默认值 0
+    print(f"  get('age') = {age}")
+    print(f"  get('age', 0) = {age_default}")
+    print(f"  get('name') = {user.get('name')}")
 
 # ============================================================
 # 3. 字典方法
 # ============================================================
-print("\n--- 常用方法 ---")
-d = {"a": 1, "b": 2}
-print(f"  keys: {list(d.keys())}")
-print(f"  values: {list(d.values())}")
-print(f"  items: {list(d.items())}")
+def demo_dict_methods():
+    print("\n--- 常用方法 ---")
+    d = {"a": 1, "b": 2}
+    print(f"  keys: {list(d.keys())}")
+    print(f"  values: {list(d.values())}")
+    print(f"  items: {list(d.items())}")
 
-# setdefault: 有就返回, 没有就设置一个默认值
-d = {"a": 1}
-val = d.setdefault("b", 99)   # b 不存在, 设置为 99
-print(f"  setdefault('b', 99) → {val}, d = {d}")
+    # setdefault: 有就返回, 没有就设置一个默认值
+    d = {"a": 1}
+    val = d.setdefault("b", 99)   # b 不存在, 设置为 99
+    print(f"  setdefault('b', 99) → {val}, d = {d}")
 
 # ============================================================
 # 4. 字典合并
 # ============================================================
-print("\n--- 字典合并 ---")
-d1 = {"a": 1, "b": 2}
-d2 = {"b": 99, "c": 3}     # b 冲突了
+def demo_merge():
+    print("\n--- 字典合并 ---")
+    d1 = {"a": 1, "b": 2}
+    d2 = {"b": 99, "c": 3}     # b 冲突了
 
-# 方式一: update (原地修改)
-d1_copy = d1.copy()
-d1_copy.update(d2)
-print(f"  update 合并: {d1_copy}")    # b=99, d2 覆盖 d1
+    # 方式一: update (原地修改)
+    d1_copy = d1.copy()
+    d1_copy.update(d2)
+    print(f"  update 合并: {d1_copy}")    # b=99, d2 覆盖 d1
 
-# 方式二: | 运算符 (Python 3.9+, 返回新字典)
-merged = d1 | d2
-print(f"  | 合并: {merged}")          # b=99
+    # 方式二: | 运算符 (Python 3.9+, 返回新字典)
+    merged = d1 | d2
+    print(f"  | 合并: {merged}")          # b=99
 
-# 方式三: ** 解包
-merged2 = {**d1, **d2}
-print(f"  ** 解包: {merged2}")        # b=99
+    # 方式三: ** 解包
+    merged2 = {**d1, **d2}
+    print(f"  ** 解包: {merged2}")        # b=99
 
 # ============================================================
 # 5. defaultdict
 # ============================================================
-print("\n--- defaultdict ---")
-# 普通 dict: 统计词频需要先检查 key 是否存在
-words = ["a", "b", "a", "c", "b", "a"]
-count1 = {}
-for w in words:
-    if w not in count1:
-        count1[w] = 0
-    count1[w] += 1
-print(f"  普通 dict: {count1}")
+def demo_defaultdict():
+    print("\n--- defaultdict ---")
+    # 普通 dict: 统计词频需要先检查 key 是否存在
+    words = ["a", "b", "a", "c", "b", "a"]
+    count1 = {}
+    for w in words:
+        if w not in count1:
+            count1[w] = 0
+        count1[w] += 1
+    print(f"  普通 dict: {count1}")
 
-# defaultdict: 自动给新 key 一个默认值
-count2 = defaultdict(int)          # int() = 0
-for w in words:
-    count2[w] += 1                  # 不需要检查 key 是否存在!
-print(f"  defaultdict(int): {dict(count2)}")
+    # defaultdict: 自动给新 key 一个默认值
+    count2 = defaultdict(int)          # int() = 0
+    for w in words:
+        count2[w] += 1                  # 不需要检查 key 是否存在!
+    print(f"  defaultdict(int): {dict(count2)}")
 
-# 按首字母分组
-names = ["Alice", "Bob", "Anna", "Bill"]
-groups = defaultdict(list)         # list() = []
-for name in names:
-    groups[name[0]].append(name)
-print(f"  按首字母分组: {dict(groups)}")
+    # 按首字母分组
+    names = ["Alice", "Bob", "Anna", "Bill"]
+    groups = defaultdict(list)         # list() = []
+    for name in names:
+        groups[name[0]].append(name)
+    print(f"  按首字母分组: {dict(groups)}")
 
 # ============================================================
 # 6. 集合
 # ============================================================
-print("\n--- 集合 ---")
+def demo_set():
+    print("\n--- 集合 ---")
 
-# 创建
-s1 = {1, 2, 3}
-s2 = set([1, 2, 2, 3, 3])        # 自动去重
-print(f"  {s2 = }")
+    # 创建
+    s1 = {1, 2, 3}
+    s2 = set([1, 2, 2, 3, 3])        # 自动去重
+    print(f"  {s2 = }")
 
-# 去重 (经典用法)
-lst = [1, 2, 2, 3, 3, 3]
-unique = list(set(lst))
-print(f"  去重 {lst} → {unique}")
+    # 去重 (经典用法)
+    lst = [1, 2, 2, 3, 3, 3]
+    unique = list(set(lst))
+    print(f"  去重 {lst} → {unique}")
 
-print("\n--- 集合运算 ---")
-a = {1, 2, 3}
-b = {2, 3, 4}
-print(f"  a = {a}, b = {b}")
-print(f"  a | b (并集) = {a | b}")
-print(f"  a & b (交集) = {a & b}")
-print(f"  a - b (差集) = {a - b}")
-print(f"  a ^ b (对称差集) = {a ^ b}")     # 在 a 或 b, 但不同时在两者
+    print("\n--- 集合运算 ---")
+    a = {1, 2, 3}
+    b = {2, 3, 4}
+    print(f"  a = {a}, b = {b}")
+    print(f"  a | b (并集) = {a | b}")
+    print(f"  a & b (交集) = {a & b}")
+    print(f"  a - b (差集) = {a - b}")
+    print(f"  a ^ b (对称差集) = {a ^ b}")     # 在 a 或 b, 但不同时在两者
 
-print("\n--- 集合方法 ---")
-s = {1, 2}
-s.add(3)                           # 添加
-print(f"  add(3) → {s}")
-s.discard(99)                       # 删除, 不存在也不报错 (推荐)
-# s.remove(99)                      # 删除, 不存在报 KeyError
-print(f"  discard(99) 不报错: {s}")
-print(f"  2 in {s}: {2 in s}")     # O(1) 成员检查
+    print("\n--- 集合方法 ---")
+    s = {1, 2}
+    s.add(3)                           # 添加
+    print(f"  add(3) → {s}")
+    s.discard(99)                       # 删除, 不存在也不报错 (推荐)
+    # s.remove(99)                      # 删除, 不存在报 KeyError
+    print(f"  discard(99) 不报错: {s}")
+    print(f"  2 in {s}: {2 in s}")     # O(1) 成员检查
 
-# frozenset: 不可变集合, 可哈希, 能当 dict key
-fs = frozenset([1, 2, 3])
-d = {fs: "frozen key"}
-print(f"\n  frozenset 作为 dict key: {d}")
+    # frozenset: 不可变集合, 可哈希, 能当 dict key
+    fs = frozenset([1, 2, 3])
+    d = {fs: "frozen key"}
+    print(f"\n  frozenset 作为 dict key: {d}")
+
+# ============================================================
+# 入口: 支持跑全部 / 跑单个
+# ============================================================
+if __name__ == "__main__":
+    import sys
+    demos = {
+        "dict_create": demo_dict_create,
+        "get": demo_get,
+        "dict_methods": demo_dict_methods,
+        "merge": demo_merge,
+        "defaultdict": demo_defaultdict,
+        "set": demo_set,
+    }
+    if len(sys.argv) > 1:
+        fn = demos.get(sys.argv[1])
+        if fn is None:
+            print(f"未知案例 '{sys.argv[1]}', 可选: {', '.join(demos)}")
+            sys.exit(1)
+        fn()
+    else:
+        for fn in demos.values():
+            fn()
 
 # ============================================================
 # 总结

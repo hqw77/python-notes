@@ -81,250 +81,286 @@
   __slots__      → 用描述符替代 __dict__, 节省内存
 
   这些都是用描述符协议实现的, 你可以在 Python 源码里验证.
+
+【运行方式】
+  全部: python 07_descriptor.py
+  单个: python 07_descriptor.py non_data / data / property / property_vs_direct / property_full / cached / priority
 """
 
 # ============================================================
 # 1. 非数据描述符 —— 只实现了 __get__
 # ============================================================
-class TenDescriptor:
-    """一个描述符，无论访问什么属性都返回 10"""
-    def __get__(self, instance, owner):
-        # instance: 调用这个描述符的实例
-        # owner:    实例所属的类
-        print(f"  __get__(instance={instance}, owner={owner.__name__})")
-        return 10
+def demo_non_data():
+    class TenDescriptor:
+        """一个描述符，无论访问什么属性都返回 10"""
+        def __get__(self, instance, owner):
+            # instance: 调用这个描述符的实例
+            # owner:    实例所属的类
+            print(f"  __get__(instance={instance}, owner={owner.__name__})")
+            return 10
 
-class MyClass:
-    x = TenDescriptor()      # 类属性 x 是一个描述符对象！
+    class MyClass:
+        x = TenDescriptor()      # 类属性 x 是一个描述符对象！
 
-obj = MyClass()
-print("--- 非数据描述符 ---")
-print(f"  obj.x = {obj.x}")  # 不是取实例属性，而是触发描述符的 __get__
-print(f"  MyClass.x = {MyClass.x}")  # instance 为 None
+    obj = MyClass()
+    print("--- 非数据描述符 ---")
+    print(f"  obj.x = {obj.x}")  # 不是取实例属性，而是触发描述符的 __get__
+    print(f"  MyClass.x = {MyClass.x}")  # instance 为 None
 
 
 # ============================================================
 # 2. 数据描述符 —— 实现了 __get__ + __set__（或 __delete__）
 # ============================================================
-# 数据描述符优先级 > 实例属性字典！这是理解 @property 的关键。
+def demo_data():
+    # 数据描述符优先级 > 实例属性字典！这是理解 @property 的关键。
 
-class LoggedAttribute:
-    """一个带类型检查和日志的属性描述符"""
-    def __init__(self, name, expected_type, default=None):
-        self.name = name            # 属性名
-        self.expected_type = expected_type
-        self.default = default
-        self._storage_name = f"_{name}"   # 实际存储用的名字
+    class LoggedAttribute:
+        """一个带类型检查和日志的属性描述符"""
+        def __init__(self, name, expected_type, default=None):
+            self.name = name            # 属性名
+            self.expected_type = expected_type
+            self.default = default
+            self._storage_name = f"_{name}"   # 实际存储用的名字
 
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self              # 类访问时返回描述符本身
-        # 用 instance.__dict__ 存，而不用 self，因为多个实例共享一个描述符
-        return instance.__dict__.get(self._storage_name, self.default)
+        def __get__(self, instance, owner):
+            if instance is None:
+                return self              # 类访问时返回描述符本身
+            # 用 instance.__dict__ 存，而不用 self，因为多个实例共享一个描述符
+            return instance.__dict__.get(self._storage_name, self.default)
 
-    def __set__(self, instance, value):
-        if not isinstance(value, self.expected_type):
-            raise TypeError(
-                f"{self.name} 必须是 {self.expected_type.__name__} 类型，"
-                f"实际是 {type(value).__name__}"
-            )
-        instance.__dict__[self._storage_name] = value
-        print(f"  [LOG] {self.name} = {value!r}")
+        def __set__(self, instance, value):
+            if not isinstance(value, self.expected_type):
+                raise TypeError(
+                    f"{self.name} 必须是 {self.expected_type.__name__} 类型，"
+                    f"实际是 {type(value).__name__}"
+                )
+            instance.__dict__[self._storage_name] = value
+            print(f"  [LOG] {self.name} = {value!r}")
 
-    def __delete__(self, instance):
-        del instance.__dict__[self._storage_name]
+        def __delete__(self, instance):
+            del instance.__dict__[self._storage_name]
 
-class Person:
-    name = LoggedAttribute("name", str, "未知")
-    age = LoggedAttribute("age", int, 0)
+    class Person:
+        name = LoggedAttribute("name", str, "未知")
+        age = LoggedAttribute("age", int, 0)
 
-    def __init__(self, name, age):
-        self.name = name       # 触发 __set__ !
-        self.age = age         # 触发 __set__ !
+        def __init__(self, name, age):
+            self.name = name       # 触发 __set__ !
+            self.age = age         # 触发 __set__ !
 
-print("\n--- 数据描述符 ---")
-p = Person("张三", 30)
-print(f"  p.name = {p.name}")   # 触发 __get__
-print(f"  p.age = {p.age}")
+    print("\n--- 数据描述符 ---")
+    p = Person("张三", 30)
+    print(f"  p.name = {p.name}")   # 触发 __get__
+    print(f"  p.age = {p.age}")
 
-print("\n  尝试赋值错误类型：")
-try:
-    p.age = "三十岁"            # 触发 __set__ → TypeError!
-except TypeError as e:
-    print(f"  捕获: {e}")
+    print("\n  尝试赋值错误类型：")
+    try:
+        p.age = "三十岁"            # 触发 __set__ → TypeError!
+    except TypeError as e:
+        print(f"  捕获: {e}")
 
 
 # ============================================================
 # 3. @property —— 描述符的语法糖（最常用！）
 # ============================================================
-# @property 本质是 Python 用描述符帮你自动生成的，不需要手写上面的类。
+def demo_property():
+    # @property 本质是 Python 用描述符帮你自动生成的，不需要手写上面的类。
 
-class Circle:
-    def __init__(self, radius):
-        self._radius = radius
+    class Circle:
+        def __init__(self, radius):
+            self._radius = radius
 
-    @property                  # 等价于 area = property(area)
-    def area(self):
-        """面积 = π * r² —— 只读属性"""
-        return 3.14159 * self._radius ** 2
+        @property                  # 等价于 area = property(area)
+        def area(self):
+            """面积 = π * r² —— 只读属性"""
+            return 3.14159 * self._radius ** 2
 
-    @property
-    def radius(self):
-        """半径 —— 可读可写"""
-        return self._radius
+        @property
+        def radius(self):
+            """半径 —— 可读可写"""
+            return self._radius
 
-    @radius.setter             # radius = radius.setter(radius_setter)
-    def radius(self, value):
-        if value < 0:
-            raise ValueError("半径不能为负数")
-        self._radius = value
+        @radius.setter             # radius = radius.setter(radius_setter)
+        def radius(self, value):
+            if value < 0:
+                raise ValueError("半径不能为负数")
+            self._radius = value
 
-    @radius.deleter
-    def radius(self):
-        print("删除半径，重置为 0")
-        self._radius = 0
+        @radius.deleter
+        def radius(self):
+            print("删除半径，重置为 0")
+            self._radius = 0
 
-print("\n--- @property ---")
-c = Circle(5)
-print(f"  半径: {c.radius}")
-print(f"  面积: {c.area:.2f}")
-c.radius = 10
-print(f"  修改半径后: {c.radius}, 面积: {c.area:.2f}")
-del c.radius
-print(f"  删除半径后: {c.radius}")
+    print("\n--- @property ---")
+    c = Circle(5)
+    print(f"  半径: {c.radius}")
+    print(f"  面积: {c.area:.2f}")
+    c.radius = 10
+    print(f"  修改半径后: {c.radius}, 面积: {c.area:.2f}")
+    del c.radius
+    print(f"  删除半径后: {c.radius}")
 
-# area 没有 setter，所以是只读的
-# c.area = 100  → AttributeError: can't set attribute
+    # area 没有 setter，所以是只读的
+    # c.area = 100  → AttributeError: can't set attribute
 
 
 # ============================================================
 # 4. @property vs 直接访问属性
 # ============================================================
-# 为什么用 @property 而不是直接 self.radius？
-# 因为如果以后需要在取值/赋值时添加逻辑，property 让你不用修改外部代码
+def demo_property_vs_direct():
+    # 为什么用 @property 而不是直接 self.radius？
+    # 因为如果以后需要在取值/赋值时添加逻辑，property 让你不用修改外部代码
 
-# 反例：一开始直接暴露属性
-class BadCircle:
-    def __init__(self, radius):
-        self.radius = radius       # 直接暴露
+    # 反例：一开始直接暴露属性
+    class BadCircle:
+        def __init__(self, radius):
+            self.radius = radius       # 直接暴露
 
-# 之后想加验证就麻烦了，因为外面已经写了 c.radius = xxx
-# 必须改成 @property → 但这是不兼容的改变
+    # 之后想加验证就麻烦了，因为外面已经写了 c.radius = xxx
+    # 必须改成 @property → 但这是不兼容的改变
 
-# 正例：从一开始就用 property 包装
-class GoodCircle:
-    def __init__(self, radius):
-        self._radius = radius     # 内部用 _radius
+    # 正例：从一开始就用 property 包装
+    class GoodCircle:
+        def __init__(self, radius):
+            self._radius = radius     # 内部用 _radius
 
-    @property
-    def radius(self):
-        return self._radius
+        @property
+        def radius(self):
+            return self._radius
 
-    @radius.setter
-    def radius(self, value):
-        if value < 0:
-            raise ValueError("半径不能为负数")
-        self._radius = value
-# 外部始终写 c.radius = xxx，内部随时可以加逻辑
+        @radius.setter
+        def radius(self, value):
+            if value < 0:
+                raise ValueError("半径不能为负数")
+            self._radius = value
+    # 外部始终写 c.radius = xxx，内部随时可以加逻辑
 
 
 # ============================================================
 # 5. property 的完整写法
 # ============================================================
-class Temperature:
-    def __init__(self, celsius=0):
-        self._celsius = celsius
+def demo_property_full():
+    class Temperature:
+        def __init__(self, celsius=0):
+            self._celsius = celsius
 
-    def get_celsius(self):
-        return self._celsius
+        def get_celsius(self):
+            return self._celsius
 
-    def set_celsius(self, value):
-        if value < -273.15:
-            raise ValueError("温度不能低于绝对零度 (-273.15°C)")
-        self._celsius = value
+        def set_celsius(self, value):
+            if value < -273.15:
+                raise ValueError("温度不能低于绝对零度 (-273.15°C)")
+            self._celsius = value
 
-    def del_celsius(self):
-        del self._celsius
+        def del_celsius(self):
+            del self._celsius
 
-    # property(fget, fset, fdel, doc)  —— 和 @property 等价
-    celsius = property(get_celsius, set_celsius, del_celsius, "摄氏温度")
+        # property(fget, fset, fdel, doc)  —— 和 @property 等价
+        celsius = property(get_celsius, set_celsius, del_celsius, "摄氏温度")
 
-print("\n--- property() 函数写法 ---")
-t = Temperature(25)
-print(f"  {t.celsius}°C")
-t.celsius = 100
-print(f"  {t.celsius}°C")
+    print("\n--- property() 函数写法 ---")
+    t = Temperature(25)
+    print(f"  {t.celsius}°C")
+    t.celsius = 100
+    print(f"  {t.celsius}°C")
 
 
 # ============================================================
 # 6. 缓存属性 —— 一个实用的描述符
 # ============================================================
-class CachedProperty:
-    """计算一次后缓存结果的描述符 —— 类似 @functools.cached_property"""
-    def __init__(self, func):
-        self.func = func
-        self.attr_name = func.__name__
+def demo_cached():
+    class CachedProperty:
+        """计算一次后缓存结果的描述符 —— 类似 @functools.cached_property"""
+        def __init__(self, func):
+            self.func = func
+            self.attr_name = func.__name__
 
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        value = self.func(instance)
-        # 算完后直接存到实例的 __dict__，下次访问时实例属性优先于描述符！
-        instance.__dict__[self.attr_name] = value
-        return value
+        def __get__(self, instance, owner):
+            if instance is None:
+                return self
+            value = self.func(instance)
+            # 算完后直接存到实例的 __dict__，下次访问时实例属性优先于描述符！
+            instance.__dict__[self.attr_name] = value
+            return value
 
-class DataLoader:
-    def __init__(self):
-        self._data = list(range(100))
+    class DataLoader:
+        def __init__(self):
+            self._data = list(range(100))
 
-    @CachedProperty
-    def stats(self):
-        """第一次访问时计算，之后直接从 __dict__ 取（描述符不再触发）"""
-        print("  >>> 正在计算 stats...")
-        return {
-            "sum": sum(self._data),
-            "min": min(self._data),
-            "max": max(self._data),
-        }
+        @CachedProperty
+        def stats(self):
+            """第一次访问时计算，之后直接从 __dict__ 取（描述符不再触发）"""
+            print("  >>> 正在计算 stats...")
+            return {
+                "sum": sum(self._data),
+                "min": min(self._data),
+                "max": max(self._data),
+            }
 
-print("\n--- 缓存属性 ---")
-dl = DataLoader()
-print(f"  第一次: {dl.stats}")     # 计算
-print(f"  第二次: {dl.stats}")     # 直接取缓存，不再计算
+    print("\n--- 缓存属性 ---")
+    dl = DataLoader()
+    print(f"  第一次: {dl.stats}")     # 计算
+    print(f"  第二次: {dl.stats}")     # 直接取缓存，不再计算
 
 
 # ============================================================
 # 7. 描述符优先级
 # ============================================================
-# 访问 obj.attr 时的查找顺序：
-#   1. 数据描述符（有 __get__ + __set__ / __delete__）  ← 最高
-#   2. 实例 __dict__
-#   3. 非数据描述符（只有 __get__）
-#   4. 类属性（普通值）
-#   5. __getattr__（如果定义了的话）  ← 最低
-print("\n--- 描述符优先级演示 ---")
+def demo_priority():
+    # 访问 obj.attr 时的查找顺序：
+    #   1. 数据描述符（有 __get__ + __set__ / __delete__）  ← 最高
+    #   2. 实例 __dict__
+    #   3. 非数据描述符（只有 __get__）
+    #   4. 类属性（普通值）
+    #   5. __getattr__（如果定义了的话）  ← 最低
+    print("\n--- 描述符优先级演示 ---")
 
-class DataDesc:
-    def __get__(self, obj, owner): return "数据描述符的值"
-    def __set__(self, obj, val):   print(f"  设置 {val}")
+    class DataDesc:
+        def __get__(self, obj, owner): return "数据描述符的值"
+        def __set__(self, obj, val):   print(f"  设置 {val}")
 
-class NonDataDesc:
-    def __get__(self, obj, owner): return "非数据描述符的值"
+    class NonDataDesc:
+        def __get__(self, obj, owner): return "非数据描述符的值"
 
-class Demo:
-    data_attr = DataDesc()       # 数据描述符
-    nondata_attr = NonDataDesc() # 非数据描述符
+    class Demo:
+        data_attr = DataDesc()       # 数据描述符
+        nondata_attr = NonDataDesc() # 非数据描述符
 
-d = Demo()
-print(f"  数据描述符: {d.data_attr}")
+    d = Demo()
+    print(f"  数据描述符: {d.data_attr}")
 
-# 实例 dict 无法覆盖数据描述符
-d.__dict__["data_attr"] = "实例自己的值"
-print(f"  实例 dict 覆盖后: {d.data_attr}")   # 还是描述符的值！
+    # 实例 dict 无法覆盖数据描述符
+    d.__dict__["data_attr"] = "实例自己的值"
+    print(f"  实例 dict 覆盖后: {d.data_attr}")   # 还是描述符的值！
 
-# 实例 dict 可以覆盖非数据描述符
-d.__dict__["nondata_attr"] = "覆盖了非数据描述符"
-print(f"  覆盖非数据描述符: {d.nondata_attr}") # 实例的值
+    # 实例 dict 可以覆盖非数据描述符
+    d.__dict__["nondata_attr"] = "覆盖了非数据描述符"
+    print(f"  覆盖非数据描述符: {d.nondata_attr}") # 实例的值
+
+
+# ============================================================
+# 入口: 支持跑全部 / 跑单个
+# ============================================================
+if __name__ == "__main__":
+    import sys
+    demos = {
+        "non_data": demo_non_data,
+        "data": demo_data,
+        "property": demo_property,
+        "property_vs_direct": demo_property_vs_direct,
+        "property_full": demo_property_full,
+        "cached": demo_cached,
+        "priority": demo_priority,
+    }
+    if len(sys.argv) > 1:
+        fn = demos.get(sys.argv[1])
+        if fn is None:
+            print(f"未知案例 '{sys.argv[1]}', 可选: {', '.join(demos)}")
+            sys.exit(1)
+        fn()
+    else:
+        for fn in demos.values():
+            fn()
 
 
 # ============================================================

@@ -42,145 +42,181 @@
 
   global 关键字: 在函数内声明要修改的是全局变量
   nonlocal 关键字: 在嵌套函数内声明要修改的是外层函数的变量
+
+【运行方式】
+  全部: python 07_function.py
+  单个: python 07_function.py define / params / default_mutable / pass_by / scope / lambda / map_filter_reduce
 """
+
+from functools import reduce
 
 # ============================================================
 # 1. 函数定义与调用
 # ============================================================
-print("--- 基本函数 ---")
+def demo_define():
+    print("--- 基本函数 ---")
 
-def greet(name):
-    """这是一个文档字符串 (docstring)"""
-    return f"Hello, {name}!"
+    def greet(name):
+        """这是一个文档字符串 (docstring)"""
+        return f"Hello, {name}!"
 
-print(f"  {greet('Alice')}")
-print(f"  函数名: {greet.__name__}")
-print(f"  文档: {greet.__doc__}")
+    print(f"  {greet('Alice')}")
+    print(f"  函数名: {greet.__name__}")
+    print(f"  文档: {greet.__doc__}")
 
 # ============================================================
 # 2. 参数类型示例
 # ============================================================
-print("\n--- 参数类型 ---")
+def demo_params():
+    print("\n--- 参数类型 ---")
 
-def demonstrate_params(pos, default="默认值", *args, keyword_only, **kwargs):
-    """展示各种参数类型"""
-    print(f"    pos: {pos}")
-    print(f"    default: {default}")
-    print(f"    *args: {args}")
-    print(f"    keyword_only: {keyword_only}")
-    print(f"    **kwargs: {kwargs}")
+    def demonstrate_params(pos, default="默认值", *args, keyword_only, **kwargs):
+        """展示各种参数类型"""
+        print(f"    pos: {pos}")
+        print(f"    default: {default}")
+        print(f"    *args: {args}")
+        print(f"    keyword_only: {keyword_only}")
+        print(f"    **kwargs: {kwargs}")
 
-print("  调用:")
-demonstrate_params(1, "改过的默认", "多余1", "多余2", keyword_only="必传关键字", extra="额外1", more="额外2")
+    print("  调用:")
+    demonstrate_params(1, "改过的默认", "多余1", "多余2", keyword_only="必传关键字", extra="额外1", more="额外2")
 
 # ============================================================
 # 3. 默认参数的陷阱!
 # ============================================================
-print("\n--- 默认参数陷阱 ---")
+def demo_default_mutable():
+    print("\n--- 默认参数陷阱 ---")
 
-def bad_append(item, target=[]):       # 不要用可变对象作为默认值!
-    target.append(item)
-    return target
+    def bad_append(item, target=[]):       # 不要用可变对象作为默认值!
+        target.append(item)
+        return target
 
-print(f"  第 1 次调用: {bad_append(1)}")   # [1]
-print(f"  第 2 次调用: {bad_append(2)}")   # [1, 2] !!! 不是 [2] !!!
-print(f"  第 3 次调用: {bad_append(3)}")   # [1, 2, 3] !!!
+    print(f"  第 1 次调用: {bad_append(1)}")   # [1]
+    print(f"  第 2 次调用: {bad_append(2)}")   # [1, 2] !!! 不是 [2] !!!
+    print(f"  第 3 次调用: {bad_append(3)}")   # [1, 2, 3] !!!
 
-# 原因: 默认值 [] 只在函数定义时创建一次, 后续调用都共享同一个列表.
+    # 原因: 默认值 [] 只在函数定义时创建一次, 后续调用都共享同一个列表.
 
-# 正确做法:
-def good_append(item, target=None):
-    if target is None:
-        target = []
-    target.append(item)
-    return target
+    # 正确做法:
+    def good_append(item, target=None):
+        if target is None:
+            target = []
+        target.append(item)
+        return target
 
-print(f"  good: {good_append(1)}, {good_append(2)}, {good_append(3)}")
+    print(f"  good: {good_append(1)}, {good_append(2)}, {good_append(3)}")
 
 # ============================================================
 # 4. 参数传递: 可变 vs 不可变
 # ============================================================
-print("\n--- 参数传递 ---")
+def demo_pass_by():
+    print("\n--- 参数传递 ---")
 
-def modify_int(n):
-    n = 999                     # 只改了局部变量, 不影响外部
+    def modify_int(n):
+        n = 999                     # 只改了局部变量, 不影响外部
 
-def modify_list(lst):
-    lst.append(999)             # 改了对象内容, 影响外部!
+    def modify_list(lst):
+        lst.append(999)             # 改了对象内容, 影响外部!
 
-x = 10
-modify_int(x)
-print(f"  不可变 int 传递后: x = {x}")    # 10 (不变)
+    x = 10
+    modify_int(x)
+    print(f"  不可变 int 传递后: x = {x}")    # 10 (不变)
 
-lst = [1, 2, 3]
-modify_list(lst)
-print(f"  可变 list 传递后: lst = {lst}")   # [1, 2, 3, 999] (被改了!)
+    lst = [1, 2, 3]
+    modify_list(lst)
+    print(f"  可变 list 传递后: lst = {lst}")   # [1, 2, 3, 999] (被改了!)
 
 # ============================================================
 # 5. 作用域: global 与 nonlocal
 # ============================================================
-print("\n--- 作用域 ---")
+def demo_scope():
+    print("\n--- 作用域 ---")
 
-global_var = "我是全局变量"
+    global_var = "我是全局变量"
 
-def outer():
-    outer_var = "我是外层变量"
+    def outer():
+        outer_var = "我是外层变量"
 
-    def inner():
-        nonlocal outer_var          # 声明要修改外层变量
-        outer_var = "被 inner 修改了"
-        return outer_var
+        def inner():
+            nonlocal outer_var          # 声明要修改外层变量
+            outer_var = "被 inner 修改了"
+            return outer_var
 
-    inner()
-    print(f"  outer_var 修改后: {outer_var}")
+        inner()
+        print(f"  outer_var 修改后: {outer_var}")
 
-outer()
-print(f"  global_var 还在: {global_var}")
+    outer()
+    print(f"  global_var 还在: {global_var}")
 
 # ============================================================
 # 6. lambda 匿名函数
 # ============================================================
-print("\n--- lambda ---")
+def demo_lambda():
+    print("\n--- lambda ---")
 
-# 普通函数
-def add(x, y):
-    return x + y
+    # 普通函数
+    def add(x, y):
+        return x + y
 
-# lambda 等价写法
-add_lambda = lambda x, y: x + y
+    # lambda 等价写法
+    add_lambda = lambda x, y: x + y
 
-print(f"  add(3, 5) = {add(3, 5)}")
-print(f"  lambda 版本: {add_lambda(3, 5)}")
+    print(f"  add(3, 5) = {add(3, 5)}")
+    print(f"  lambda 版本: {add_lambda(3, 5)}")
 
-# 常用场景: sorted 的 key 参数
-students = [("Alice", 90), ("Bob", 85), ("Charlie", 95)]
-sorted_students = sorted(students, key=lambda s: s[1])  # 按分数排序
-print(f"  按分数排序: {sorted_students}")
+    # 常用场景: sorted 的 key 参数
+    students = [("Alice", 90), ("Bob", 85), ("Charlie", 95)]
+    sorted_students = sorted(students, key=lambda s: s[1])  # 按分数排序
+    print(f"  按分数排序: {sorted_students}")
 
 # ============================================================
 # 7. map / filter / reduce
 # ============================================================
-print("\n--- map / filter / reduce ---")
+def demo_map_filter_reduce():
+    print("\n--- map / filter / reduce ---")
 
-nums = [1, 2, 3, 4, 5]
+    nums = [1, 2, 3, 4, 5]
 
-# map: 每个元素做变换
-squared = list(map(lambda x: x**2, nums))
-print(f"  map 平方: {squared}")
+    # map: 每个元素做变换
+    squared = list(map(lambda x: x**2, nums))
+    print(f"  map 平方: {squared}")
 
-# filter: 筛选满足条件的元素
-even = list(filter(lambda x: x % 2 == 0, nums))
-print(f"  filter 偶数: {even}")
+    # filter: 筛选满足条件的元素
+    even = list(filter(lambda x: x % 2 == 0, nums))
+    print(f"  filter 偶数: {even}")
 
-# reduce: 累积计算
-from functools import reduce
-total = reduce(lambda acc, x: acc + x, nums)
-print(f"  reduce 求和: {total}")
+    # reduce: 累积计算
+    total = reduce(lambda acc, x: acc + x, nums)
+    print(f"  reduce 求和: {total}")
 
-# 注意: 在现代 Python 中, 列表推导式通常比 map/filter 更可读:
-squared2 = [x**2 for x in nums]
-even2 = [x for x in nums if x % 2 == 0]
-print(f"  列表推导式 (更推荐): squared={squared2}, even={even2}")
+    # 注意: 在现代 Python 中, 列表推导式通常比 map/filter 更可读:
+    squared2 = [x**2 for x in nums]
+    even2 = [x for x in nums if x % 2 == 0]
+    print(f"  列表推导式 (更推荐): squared={squared2}, even={even2}")
+
+# ============================================================
+# 入口: 支持跑全部 / 跑单个
+# ============================================================
+if __name__ == "__main__":
+    import sys
+    demos = {
+        "define": demo_define,
+        "params": demo_params,
+        "default_mutable": demo_default_mutable,
+        "pass_by": demo_pass_by,
+        "scope": demo_scope,
+        "lambda": demo_lambda,
+        "map_filter_reduce": demo_map_filter_reduce,
+    }
+    if len(sys.argv) > 1:
+        fn = demos.get(sys.argv[1])
+        if fn is None:
+            print(f"未知案例 '{sys.argv[1]}', 可选: {', '.join(demos)}")
+            sys.exit(1)
+        fn()
+    else:
+        for fn in demos.values():
+            fn()
 
 # ============================================================
 # 总结

@@ -96,46 +96,20 @@
   重试机制    → 失败后自动重试
   输入验证    → 检查参数合法性
   注册回调    → 把函数自动加入某个列表
+
+【运行方式】
+  全部: python 06_decorator.py
+  单个: python 06_decorator.py first_class / manual_decorator / at_syntax / args_decorator / wraps / timer / retry / auth / stacking / class_decorator
 """
 
+import random
 import time
 from functools import wraps
 
-# ============================================================
-# 0. 前置知识：函数是一等公民 + 闭包
-# ============================================================
-print("--- 前置：函数是一等公民 ---")
-
-def greet(name):
-    return f"Hello, {name}"
-
-# 函数可以赋值给变量
-g = greet
-print(f"  变量调用: {g('Alice')}")
-
-# 函数可以作为参数传递
-def apply(func, arg):
-    return func(arg)
-print(f"  作为参数: {apply(greet, 'Bob')}")
-
-# 函数可以作为返回值（闭包）
-def make_multiplier(n):
-    """返回一个把输入乘以 n 的函数"""
-    def multiplier(x):
-        return x * n           # multiplier "记住" 了外部的 n
-    return multiplier
-
-times3 = make_multiplier(3)
-times5 = make_multiplier(5)
-print(f"  闭包 times3(10): {times3(10)}")   # 30
-print(f"  闭包 times5(10): {times5(10)}")   # 50
-
 
 # ============================================================
-# 1. 最简单的装饰器 —— 手动实现
+# 共享装饰器 (被多个案例复用, 放模块顶层)
 # ============================================================
-print("\n--- 手动装饰器 ---")
-
 def my_decorator(func):
     """装饰器：接收函数，返回新函数"""
     def wrapper():
@@ -144,30 +118,7 @@ def my_decorator(func):
         print("  装饰器添加的后置操作")
     return wrapper
 
-def say_hello():
-    print("  Hello World!")
 
-# 手动装饰
-say_hello = my_decorator(say_hello)
-say_hello()
-
-
-# ============================================================
-# 2. 使用 @ 语法糖
-# ============================================================
-print("\n--- @ 语法糖 ---")
-
-@my_decorator
-def say_bye():
-    print("  Bye World!")
-
-# 上面的 @my_decorator 等价于 say_bye = my_decorator(say_bye)
-say_bye()
-
-
-# ============================================================
-# 3. 装饰带参数的函数 —— 用 *args **kwargs
-# ============================================================
 def logger(func):
     """打印函数调用参数的装饰器"""
     def wrapper(*args, **kwargs):
@@ -177,54 +128,6 @@ def logger(func):
         return result
     return wrapper
 
-@logger
-def add(a, b):
-    return a + b
-
-print("\n--- 装饰带参函数 ---")
-add(3, 5)
-add(b=10, a=7)
-
-
-# ============================================================
-# 4. functools.wraps —— 保留原函数的元信息
-# ============================================================
-print("\n--- functools.wraps ---")
-
-# 没加 wraps 的问题
-def bad_decorator(func):
-    def wrapper(*args, **kwargs):
-        return func(*args, **kwargs)
-    return wrapper
-
-@bad_decorator
-def my_func():
-    """这是文档字符串"""
-    pass
-
-print(f"  没 wraps: 名字={my_func.__name__}, 文档={my_func.__doc__}")
-# 输出: wrapper, None —— 元信息丢失了!
-
-# 加了 wraps
-def good_decorator(func):
-    @wraps(func)                   # 把 func 的元信息复制到 wrapper
-    def wrapper(*args, **kwargs):
-        return func(*args, **kwargs)
-    return wrapper
-
-@good_decorator
-def my_func2():
-    """这是文档字符串"""
-    pass
-
-print(f"  有 wraps: 名字={my_func2.__name__}, 文档={my_func2.__doc__}")
-# 输出: my_func2, 这是文档字符串 —— 正确保留！
-
-
-# ============================================================
-# 5. 实用装饰器一：计时器
-# ============================================================
-print("\n--- 计时器装饰器 ---")
 
 def timer(func):
     @wraps(func)
@@ -236,241 +139,385 @@ def timer(func):
         return result
     return wrapper
 
-@timer
-def slow_sum(n):
-    return sum(range(n))
 
-# slow_sum(10_000_000)
-#     ↓
-# 发现被 @timer 装饰，实际调用 wrapper(10_000_000)
-#     ↓
-# wrapper 内部：
-#     1. 记录开始时间
-#     2. 通过持有的 func 引用，去执行真正的 slow_sum(10_000_000)
-#        └── 内部执行 sum(range(n))，计算出结果 49999995000000
-#     3. 记录结束时间，打印耗时
-#     4. return result  (把巨大的数字交还给调用者)
-#     ↓
-# 因为调用者没写 `x = slow_sum(...)`，这个返回的巨大数字被 Python 解释器直接丢弃（内存释放）
-#     ↓
-# 屏幕上只留下装饰器里的 print 输出的耗时日志
-slow_sum(10_000_000)
+# ============================================================
+# 0. 前置知识：函数是一等公民 + 闭包
+# ============================================================
+def demo_first_class():
+    print("--- 前置：函数是一等公民 ---")
 
+    def greet(name):
+        return f"Hello, {name}"
+
+    # 函数可以赋值给变量
+    g = greet
+    print(f"  变量调用: {g('Alice')}")
+
+    # 函数可以作为参数传递
+    def apply(func, arg):
+        return func(arg)
+    print(f"  作为参数: {apply(greet, 'Bob')}")
+
+    # 函数可以作为返回值（闭包）
+    def make_multiplier(n):
+        """返回一个把输入乘以 n 的函数"""
+        def multiplier(x):
+            return x * n           # multiplier "记住" 了外部的 n
+        return multiplier
+
+    times3 = make_multiplier(3)
+    times5 = make_multiplier(5)
+    print(f"  闭包 times3(10): {times3(10)}")   # 30
+    print(f"  闭包 times5(10): {times5(10)}")   # 50
+
+
+# ============================================================
+# 1. 最简单的装饰器 —— 手动实现
+# ============================================================
+def demo_manual_decorator():
+    print("\n--- 手动装饰器 ---")
+
+    def say_hello():
+        print("  Hello World!")
+
+    # 手动装饰
+    say_hello = my_decorator(say_hello)
+    say_hello()
+
+
+# ============================================================
+# 2. 使用 @ 语法糖
+# ============================================================
+def demo_at_syntax():
+    print("\n--- @ 语法糖 ---")
+
+    @my_decorator
+    def say_bye():
+        print("  Bye World!")
+
+    # 上面的 @my_decorator 等价于 say_bye = my_decorator(say_bye)
+    say_bye()
+
+
+# ============================================================
+# 3. 装饰带参数的函数 —— 用 *args **kwargs
+# ============================================================
+def demo_args_decorator():
+    @logger
+    def add(a, b):
+        return a + b
+
+    print("\n--- 装饰带参函数 ---")
+    add(3, 5)
+    add(b=10, a=7)
+
+
+# ============================================================
+# 4. functools.wraps —— 保留原函数的元信息
+# ============================================================
+def demo_wraps():
+    print("\n--- functools.wraps ---")
+
+    # 没加 wraps 的问题
+    def bad_decorator(func):
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+        return wrapper
+
+    @bad_decorator
+    def my_func():
+        """这是文档字符串"""
+        pass
+
+    print(f"  没 wraps: 名字={my_func.__name__}, 文档={my_func.__doc__}")
+    # 输出: wrapper, None —— 元信息丢失了!
+
+    # 加了 wraps
+    def good_decorator(func):
+        @wraps(func)                   # 把 func 的元信息复制到 wrapper
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+        return wrapper
+
+    @good_decorator
+    def my_func2():
+        """这是文档字符串"""
+        pass
+
+    print(f"  有 wraps: 名字={my_func2.__name__}, 文档={my_func2.__doc__}")
+    # 输出: my_func2, 这是文档字符串 —— 正确保留！
+
+
+# ============================================================
+# 5. 实用装饰器一：计时器
+# ============================================================
+def demo_timer():
+    print("\n--- 计时器装饰器 ---")
+
+    @timer
+    def slow_sum(n):
+        return sum(range(n))
+
+    # slow_sum(10_000_000)
+    #     ↓
+    # 发现被 @timer 装饰，实际调用 wrapper(10_000_000)
+    #     ↓
+    # wrapper 内部：
+    #     1. 记录开始时间
+    #     2. 通过持有的 func 引用，去执行真正的 slow_sum(10_000_000)
+    #        └── 内部执行 sum(range(n))，计算出结果 49999995000000
+    #     3. 记录结束时间，打印耗时
+    #     4. return result  (把巨大的数字交还给调用者)
+    #     ↓
+    # 因为调用者没写 `x = slow_sum(...)`，这个返回的巨大数字被 Python 解释器直接丢弃（内存释放）
+    #     ↓
+    # 屏幕上只留下装饰器里的 print 输出的耗时日志
+    slow_sum(10_000_000)
 
 
 # ============================================================
 # 6. 实用装饰器二：重试机制
 # ============================================================
-# 带参数的装饰器 = "装饰器工厂". 你写的 @retry(max_attempts=3) 其实是两步:
-#   第 1 步: retry(max_attempts=3) 被调用 → 返回 decorator 函数
-#   第 2 步: @decorator 把 unreliable_function 传入 → 返回 wrapper
-#
-# 展开来就是: unreliable_function = retry(max_attempts=3)(unreliable_function)
-#                    ↑                        ↑                    ↑
-#                 最终结果           第1步: 调用工厂      第2步: 传入原函数
+def demo_retry():
+    # 带参数的装饰器 = "装饰器工厂". 你写的 @retry(max_attempts=3) 其实是两步:
+    #   第 1 步: retry(max_attempts=3) 被调用 → 返回 decorator 函数
+    #   第 2 步: @decorator 把 unreliable_function 传入 → 返回 wrapper
+    #
+    # 展开来就是: unreliable_function = retry(max_attempts=3)(unreliable_function)
+    #                    ↑                        ↑                    ↑
+    #                 最终结果           第1步: 调用工厂      第2步: 传入原函数
 
-import random
+    def retry(max_attempts=3):
+        """装饰器工厂: 接收参数, 返回一个真正的装饰器"""
+        def decorator(func):
+            """真正的装饰器: 接收函数, 返回 wrapper"""
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                """wrapper: 包装原函数, 失败时重试"""
+                for attempt in range(1, max_attempts + 1):
+                    try:
+                        return func(*args, **kwargs)
+                    except Exception as e:
+                        print(f"    第 {attempt} 次失败: {e}")
+                        if attempt == max_attempts:
+                            raise       # 最后一次也失败了 → 放弃, 抛异常
+                return None
+            return wrapper
+        return decorator
 
-def retry(max_attempts=3):
-    """装饰器工厂: 接收参数, 返回一个真正的装饰器"""
-    def decorator(func):
-        """真正的装饰器: 接收函数, 返回 wrapper"""
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            """wrapper: 包装原函数, 失败时重试"""
-            for attempt in range(1, max_attempts + 1):
-                try:
-                    return func(*args, **kwargs)
-                except Exception as e:
-                    print(f"    第 {attempt} 次失败: {e}")
-                    if attempt == max_attempts:
-                        raise       # 最后一次也失败了 → 放弃, 抛异常
-            return None
-        return wrapper
-    return decorator
+    print("\n--- 重试装饰器 ---")
 
-print("\n--- 重试装饰器 ---")
+    call_count = 0
 
-call_count = 0
+    @retry(max_attempts=3)                   # ← 工厂先执行, 返回装饰器, 装饰器再执行
+    def unreliable_function():
+        nonlocal call_count
+        call_count += 1
+        if call_count < 3:                   # 前 2 次故意失败
+            raise ValueError(f"模拟失败 (第{call_count}次)")
+        return "成功!"
 
-@retry(max_attempts=3)                   # ← 工厂先执行, 返回装饰器, 装饰器再执行
-def unreliable_function():
-    global call_count
-    call_count += 1
-    if call_count < 3:                   # 前 2 次故意失败
-        raise ValueError(f"模拟失败 (第{call_count}次)")
-    return "成功!"
-
-# ====================================
-# 第 0 步: 定义装饰器工厂
-# ====================================
-def retry(max_attempts=3):
-    def decorator(func):                # ← func 在这里: 被闭包"记住"
-        @wraps(func)
-        def wrapper(*args, **kwargs):   # ← *args, **kwargs 收集所有传入的参数
-            for attempt in range(1, max_attempts + 1):
-                try:
-                    return func(*args, **kwargs)  # ← 把参数原样传给原函数
-                except Exception as e:
-                    if attempt == max_attempts:
-                        raise
-        return wrapper
-    return decorator
+    # ====================================
+    # 第 0 步: 定义装饰器工厂
+    # ====================================
+    def retry(max_attempts=3):
+        def decorator(func):                # ← func 在这里: 被闭包"记住"
+            @wraps(func)
+            def wrapper(*args, **kwargs):   # ← *args, **kwargs 收集所有传入的参数
+                for attempt in range(1, max_attempts + 1):
+                    try:
+                        return func(*args, **kwargs)  # ← 把参数原样传给原函数
+                    except Exception as e:
+                        if attempt == max_attempts:
+                            raise
+            return wrapper
+        return decorator
 
 
-# ====================================
-# 第 1 步: @retry(3) 执行
-# ====================================
-# retry(3) 被调用 → 返回 decorator 函数
-# max_attempts=3 被闭包记住
+    # ====================================
+    # 第 1 步: @retry(3) 执行
+    # ====================================
+    # retry(3) 被调用 → 返回 decorator 函数
+    # max_attempts=3 被闭包记住
 
-# ====================================
-# 第 2 步: @decorator 执行
-# ====================================
-# decorator(unreliable_function) 被调用 → 返回 wrapper
-# func = unreliable_function 被闭包记住 (就在 decorator 的 func 参数里!)
+    # ====================================
+    # 第 2 步: @decorator 执行
+    # ====================================
+    # decorator(unreliable_function) 被调用 → 返回 wrapper
+    # func = unreliable_function 被闭包记住 (就在 decorator 的 func 参数里!)
 
-# ====================================
-# 第 3 步: 变量名被替换
-# ====================================
-# unreliable_function = wrapper
-#       ↑                      ↑
-#    这个名字现在           指向 wrapper 函数
-#    指向 wrapper
+    # ====================================
+    # 第 3 步: 变量名被替换
+    # ====================================
+    # unreliable_function = wrapper
+    #       ↑                      ↑
+    #    这个名字现在           指向 wrapper 函数
+    #    指向 wrapper
 
-# ====================================
-# 第 4 步: 调用 unreliable_function()
-# ====================================
-# 你写: unreliable_function()
-# 实际执行: wrapper()
-#     ↓
-# wrapper 内部:
-#   for attempt in 1..3:
-#       try:
-#           return func()          ← 这里的 func 就是被闭包记住的原函数!
-#       except:
-#           ...
-
+    # ====================================
+    # 第 4 步: 调用 unreliable_function()
+    # ====================================
+    # 你写: unreliable_function()
+    # 实际执行: wrapper()
+    #     ↓
+    # wrapper 内部:
+    #   for attempt in 1..3:
+    #       try:
+    #           return func()          ← 这里的 func 就是被闭包记住的原函数!
+    #       except:
+    #           ...
 
 
 
-# 执行流程追踪:
-# unreliable_function()
-#     ↓
-# 发现被 @retry(3) 装饰, 实际调用 wrapper()
-#     ↓
-# wrapper 内部 (attempt 从 1 到 3):
-#     attempt=1: 调用 func() → 抛 ValueError → 打印失败 → continue
-#     attempt=2: 调用 func() → 抛 ValueError → 打印失败 → continue
-#     attempt=3: 调用 func() → call_count=3, 不再抛异常 → 返回 "成功!"
-#     ↓
-# 返回 "成功!"
 
-print(f"  结果: {unreliable_function()}")
+    # 执行流程追踪:
+    # unreliable_function()
+    #     ↓
+    # 发现被 @retry(3) 装饰, 实际调用 wrapper()
+    #     ↓
+    # wrapper 内部 (attempt 从 1 到 3):
+    #     attempt=1: 调用 func() → 抛 ValueError → 打印失败 → continue
+    #     attempt=2: 调用 func() → 抛 ValueError → 打印失败 → continue
+    #     attempt=3: 调用 func() → call_count=3, 不再抛异常 → 返回 "成功!"
+    #     ↓
+    # 返回 "成功!"
+
+    print(f"  结果: {unreliable_function()}")
 
 
 # ============================================================
 # 7. 实用装饰器三：权限检查
 # ============================================================
-# 和重试装饰器一样, @require_auth(user) 也是"装饰器工厂"模式.
-# require_auth(admin_user) → 返回 decorator → @decorator 装饰函数
-#
-# 关键点: user 在定义装饰器时就固定了! admin_user 和 normal_user 是
-# 两个不同的字典, 分别传入 require_auth, 产生两个不同的 decorator,
-# 两个 decorator 又分别固定了自己看到的 user.
+def demo_auth():
+    # 和重试装饰器一样, @require_auth(user) 也是"装饰器工厂"模式.
+    # require_auth(admin_user) → 返回 decorator → @decorator 装饰函数
+    #
+    # 关键点: user 在定义装饰器时就固定了! admin_user 和 normal_user 是
+    # 两个不同的字典, 分别传入 require_auth, 产生两个不同的 decorator,
+    # 两个 decorator 又分别固定了自己看到的 user.
 
-def require_auth(user):
-    """装饰器工厂: 用给定的 user 检查权限. user 被闭包"记住"."""
-    def decorator(func):
-        """接收被装饰的函数"""
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            if user.get("is_admin"):             # 检查闭包记住的 user
-                return func(*args, **kwargs)      # 有权限 → 正常执行
-            else:
-                print(f"  权限不足: {user.get('name')} 不能执行 {func.__name__}")
-                return None                       # 无权限 → 返回 None
-        return wrapper
-    return decorator
+    def require_auth(user):
+        """装饰器工厂: 用给定的 user 检查权限. user 被闭包"记住"."""
+        def decorator(func):
+            """接收被装饰的函数"""
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                if user.get("is_admin"):             # 检查闭包记住的 user
+                    return func(*args, **kwargs)      # 有权限 → 正常执行
+                else:
+                    print(f"  权限不足: {user.get('name')} 不能执行 {func.__name__}")
+                    return None                       # 无权限 → 返回 None
+            return wrapper
+        return decorator
 
-print("\n--- 权限检查装饰器 ---")
+    print("\n--- 权限检查装饰器 ---")
 
-admin_user = {"name": "管理员", "is_admin": True}
-normal_user = {"name": "普通用户", "is_admin": False}
+    admin_user = {"name": "管理员", "is_admin": True}
+    normal_user = {"name": "普通用户", "is_admin": False}
 
-@require_auth(admin_user)                # user=admin_user 被闭包记住
-def delete_post(post_id):
-    print(f"  帖子 {post_id} 已删除")
+    @require_auth(admin_user)                # user=admin_user 被闭包记住
+    def delete_post(post_id):
+        print(f"  帖子 {post_id} 已删除")
 
-@require_auth(normal_user)               # user=normal_user 被闭包记住
-def create_post(title):
-    print(f"  帖子 '{title}' 已创建")
+    @require_auth(normal_user)               # user=normal_user 被闭包记住
+    def create_post(title):
+        print(f"  帖子 '{title}' 已创建")
 
-# 执行流程追踪:
-# delete_post(123)
-#     ↓
-# 发现被 @require_auth(admin_user) 装饰, 实际调用 wrapper(123)
-#     ↓
-# wrapper 内部:
-#     user = admin_user (闭包记住的)
-#     user.get("is_admin") → True → 有权限
-#     执行 func(123) → print("帖子 123 已删除")
-#     ↓
-# 成功执行!
+    # 执行流程追踪:
+    # delete_post(123)
+    #     ↓
+    # 发现被 @require_auth(admin_user) 装饰, 实际调用 wrapper(123)
+    #     ↓
+    # wrapper 内部:
+    #     user = admin_user (闭包记住的)
+    #     user.get("is_admin") → True → 有权限
+    #     执行 func(123) → print("帖子 123 已删除")
+    #     ↓
+    # 成功执行!
 
-# create_post("新帖子")
-#     ↓
-# 发现被 @require_auth(normal_user) 装饰, 实际调用 wrapper("新帖子")
-#     ↓
-# wrapper 内部:
-#     user = normal_user (闭包记住的)
-#     user.get("is_admin") → False → 无权限
-#     print("权限不足...") → return None
-#     ↓
-# 被拒绝执行!
+    # create_post("新帖子")
+    #     ↓
+    # 发现被 @require_auth(normal_user) 装饰, 实际调用 wrapper("新帖子")
+    #     ↓
+    # wrapper 内部:
+    #     user = normal_user (闭包记住的)
+    #     user.get("is_admin") → False → 无权限
+    #     print("权限不足...") → return None
+    #     ↓
+    # 被拒绝执行!
 
-delete_post(123)          # 成功
-create_post("新帖子")       # 权限不足
+    delete_post(123)          # 成功
+    create_post("新帖子")       # 权限不足
 
 
 # ============================================================
 # 8. 装饰器可以叠加
 # ============================================================
-print("\n--- 装饰器叠加 ---")
+def demo_stacking():
+    print("\n--- 装饰器叠加 ---")
 
-@timer
-@logger
-def multiply(a, b):
-    return a * b
+    @timer
+    @logger
+    def multiply(a, b):
+        return a * b
 
-# 等价于 multiply = timer(logger(multiply))
-# 执行顺序（洋葱模型）：timer → logger → multiply → logger → timer
-result = multiply(6, 7)
-print(f"  最终结果: {result}")
+    # 等价于 multiply = timer(logger(multiply))
+    # 执行顺序（洋葱模型）：timer → logger → multiply → logger → timer
+    result = multiply(6, 7)
+    print(f"  最终结果: {result}")
 
 
 # ============================================================
 # 9. 类装饰器（复习：你在 03_callable.py 已见过）
 # ============================================================
-class CountCalls:
-    """统计函数被调用次数的装饰器"""
-    def __init__(self, func):
-        self.func = func
-        self.count = 0
+def demo_class_decorator():
+    class CountCalls:
+        """统计函数被调用次数的装饰器"""
+        def __init__(self, func):
+            self.func = func
+            self.count = 0
 
-    def __call__(self, *args, **kwargs):
-        self.count += 1
-        print(f"  {self.func.__name__} 被调用了 {self.count} 次")
-        return self.func(*args, **kwargs)
+        def __call__(self, *args, **kwargs):
+            self.count += 1
+            print(f"  {self.func.__name__} 被调用了 {self.count} 次")
+            return self.func(*args, **kwargs)
 
-print("\n--- 类装饰器 ---")
+    print("\n--- 类装饰器 ---")
 
-@CountCalls
-def greet(name):
-    print(f"    Hello, {name}!")
+    @CountCalls
+    def greet(name):
+        print(f"    Hello, {name}!")
 
-greet("Alice")
-greet("Bob")
+    greet("Alice")
+    greet("Bob")
+
+
+# ============================================================
+# 入口: 支持跑全部 / 跑单个
+# ============================================================
+if __name__ == "__main__":
+    import sys
+    demos = {
+        "first_class": demo_first_class,
+        "manual_decorator": demo_manual_decorator,
+        "at_syntax": demo_at_syntax,
+        "args_decorator": demo_args_decorator,
+        "wraps": demo_wraps,
+        "timer": demo_timer,
+        "retry": demo_retry,
+        "auth": demo_auth,
+        "stacking": demo_stacking,
+        "class_decorator": demo_class_decorator,
+    }
+    if len(sys.argv) > 1:
+        fn = demos.get(sys.argv[1])
+        if fn is None:
+            print(f"未知案例 '{sys.argv[1]}', 可选: {', '.join(demos)}")
+            sys.exit(1)
+        fn()
+    else:
+        for fn in demos.values():
+            fn()
 
 
 # ============================================================

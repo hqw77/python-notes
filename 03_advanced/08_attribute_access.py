@@ -68,165 +68,199 @@
   __getattribute__:
     - 极少数场景, 如 ORM 的懒加载, 属性访问审计
     - 90% 的情况应该用 __getattr__ 代替
+
+【运行方式】
+  全部: python 08_attribute_access.py
+  单个: python 08_attribute_access.py getattr / proxy / setattr / delattr / getattribute / order
 """
 
 # ============================================================
 # 1. __getattr__ —— 属性不存在时才触发
 # ============================================================
-class DynamicAttributes:
-    """对不存在的属性返回默认值，而不是抛 AttributeError"""
-    def __init__(self):
-        self.existing = "我有这个属性"
+def demo_getattr():
+    class DynamicAttributes:
+        """对不存在的属性返回默认值，而不是抛 AttributeError"""
+        def __init__(self):
+            self.existing = "我有这个属性"
 
-    def __getattr__(self, name):
-        """只有正常查找失败时才会调用这个方法"""
-        print(f"  __getattr__ 被调用: 属性 '{name}' 不存在")
-        return f"动态生成的 '{name}' 值"
+        def __getattr__(self, name):
+            """只有正常查找失败时才会调用这个方法"""
+            print(f"  __getattr__ 被调用: 属性 '{name}' 不存在")
+            return f"动态生成的 '{name}' 值"
 
-obj = DynamicAttributes()
-print("--- __getattr__: 属性不存在时触发 ---")
-print(f"  obj.existing = {obj.existing}")    # 正常访问，不触发 __getattr__
-print(f"  obj.missing = {obj.missing}")      # 属性不存在，触发 __getattr__
-print(f"  obj.anything = {obj.anything}")     # 同样触发
+    obj = DynamicAttributes()
+    print("--- __getattr__: 属性不存在时触发 ---")
+    print(f"  obj.existing = {obj.existing}")    # 正常访问，不触发 __getattr__
+    print(f"  obj.missing = {obj.missing}")      # 属性不存在，触发 __getattr__
+    print(f"  obj.anything = {obj.anything}")     # 同样触发
 
 
 # ============================================================
 # 2. __getattr__ 实用案例：代理 / 包装器
 # ============================================================
-class Proxy:
-    """将不存在的方法调用转发到内部对象"""
-    def __init__(self, target):
-        self._target = target
+def demo_proxy():
+    class Proxy:
+        """将不存在的方法调用转发到内部对象"""
+        def __init__(self, target):
+            self._target = target
 
-    def __getattr__(self, name):
-        """把对 Proxy 的调用转发给 _target"""
-        print(f"  转发: {name} -> _target")
-        return getattr(self._target, name)     # 从 _target 上取
+        def __getattr__(self, name):
+            """把对 Proxy 的调用转发给 _target"""
+            print(f"  转发: {name} -> _target")
+            return getattr(self._target, name)     # 从 _target 上取
 
-print("\n--- __getattr__: 代理模式 ---")
-plist = Proxy([1, 2, 3])
-print(f"  plist.append(4): {plist.append(4)}")
-print(f"  plist.__class__: {plist.__class__}")     # 不会拦截 __class__，因为实际存在
-print(f"  plist._target: {plist._target}")          # 不会拦截 _target
+    print("\n--- __getattr__: 代理模式 ---")
+    plist = Proxy([1, 2, 3])
+    print(f"  plist.append(4): {plist.append(4)}")
+    print(f"  plist.__class__: {plist.__class__}")     # 不会拦截 __class__，因为实际存在
+    print(f"  plist._target: {plist._target}")          # 不会拦截 _target
 
 
 # ============================================================
 # 3. __setattr__ —— 每次设置属性都触发
 # ============================================================
-class GuardedObject:
-    """记录所有属性的设置操作"""
-    def __init__(self, name):
-        # 这里必须用 object.__setattr__ 或 self.__dict__，否则无限递归！
-        object.__setattr__(self, "_log", [])
-        self.name = name                   # 这会触发 __setattr__
+def demo_setattr():
+    class GuardedObject:
+        """记录所有属性的设置操作"""
+        def __init__(self, name):
+            # 这里必须用 object.__setattr__ 或 self.__dict__，否则无限递归！
+            object.__setattr__(self, "_log", [])
+            self.name = name                   # 这会触发 __setattr__
 
-    def __setattr__(self, name, value):
-        """拦截所有 self.xxx = yyy 操作"""
-        log = object.__getattribute__(self, "_log")   # 绕过 __getattribute__
-        log.append(f"设置 {name} = {value!r}")
-        # 安全地设置属性 —— 用父类的 __setattr__
-        object.__setattr__(self, name, value)
+        def __setattr__(self, name, value):
+            """拦截所有 self.xxx = yyy 操作"""
+            log = object.__getattribute__(self, "_log")   # 绕过 __getattribute__
+            log.append(f"设置 {name} = {value!r}")
+            # 安全地设置属性 —— 用父类的 __setattr__
+            object.__setattr__(self, name, value)
 
-    def show_log(self):
-        for entry in self._log:
-            print(f"  {entry}")
+        def show_log(self):
+            for entry in self._log:
+                print(f"  {entry}")
 
-print("\n--- __setattr__: 拦截属性设置 ---")
-g = GuardedObject("初始值")
-g.age = 30
-g.name = "新名字"
-g.show_log()
+    print("\n--- __setattr__: 拦截属性设置 ---")
+    g = GuardedObject("初始值")
+    g.age = 30
+    g.name = "新名字"
+    g.show_log()
 
 
 # ============================================================
 # 4. __delattr__ —— 每次删除属性时触发
 # ============================================================
-class Protected:
-    """阻止删除特定属性"""
-    def __init__(self):
-        self.normal = "可以删"
-        self.protected = "不能删"
+def demo_delattr():
+    class Protected:
+        """阻止删除特定属性"""
+        def __init__(self):
+            self.normal = "可以删"
+            self.protected = "不能删"
 
-    def __delattr__(self, name):
-        if name == "protected":
-            print(f"  __delattr__: 禁止删除 '{name}' ")
-            return
-        # 安全地删除属性
-        object.__delattr__(self, name)
-        print(f"  已删除: '{name}'")
+        def __delattr__(self, name):
+            if name == "protected":
+                print(f"  __delattr__: 禁止删除 '{name}' ")
+                return
+            # 安全地删除属性
+            object.__delattr__(self, name)
+            print(f"  已删除: '{name}'")
 
-print("\n--- __delattr__: 拦截属性删除 ---")
-p = Protected()
-del p.normal
-print(f"  p.normal 还在吗: {hasattr(p, 'normal')}")   # False
-del p.protected                                       # 被拦截
-print(f"  p.protected 还在吗: {hasattr(p, 'protected')}")  # True
+    print("\n--- __delattr__: 拦截属性删除 ---")
+    p = Protected()
+    del p.normal
+    print(f"  p.normal 还在吗: {hasattr(p, 'normal')}")   # False
+    del p.protected                                       # 被拦截
+    print(f"  p.protected 还在吗: {hasattr(p, 'protected')}")  # True
 
 
 # ============================================================
 # 5. __getattribute__ —— 危险！每次访问属性都触发
 # ============================================================
-class LogAccess:
-    """记录所有属性访问（包括存在的属性）"""
-    def __init__(self):
-        object.__setattr__(self, "_access_log", [])
+def demo_getattribute():
+    class LogAccess:
+        """记录所有属性访问（包括存在的属性）"""
+        def __init__(self):
+            object.__setattr__(self, "_access_log", [])
 
-    def __getattribute__(self, name):
-        """每次访问任何属性都会触发 —— 极易无限递归！"""
-        # 绝对不能写 self._access_log ！！！会无限递归！！！
-        log = object.__getattribute__(self, "_access_log")
-        if not name.startswith("_"):
-            log.append(f"访问了 {name}")
-        return object.__getattribute__(self, name)
+        def __getattribute__(self, name):
+            """每次访问任何属性都会触发 —— 极易无限递归！"""
+            # 绝对不能写 self._access_log ！！！会无限递归！！！
+            log = object.__getattribute__(self, "_access_log")
+            if not name.startswith("_"):
+                log.append(f"访问了 {name}")
+            return object.__getattribute__(self, name)
 
-print("\n--- __getattribute__: 拦截所有访问 ---")
-la = LogAccess()
-la.x = 10
-print(f"  la.x = {la.x}")
-print(f"  la.x = {la.x}")
-print(f"  访问日志: {la._access_log}")
+    print("\n--- __getattribute__: 拦截所有访问 ---")
+    la = LogAccess()
+    la.x = 10
+    print(f"  la.x = {la.x}")
+    print(f"  la.x = {la.x}")
+    print(f"  访问日志: {la._access_log}")
 
 
 # ============================================================
 # 6. 四者调用顺序总结
 # ============================================================
-print("\n--- 调用顺序演示 ---")
+def demo_order():
+    print("\n--- 调用顺序演示 ---")
 
-class FullControl:
-    def __init__(self):
-        object.__setattr__(self, "_data", {})
-        self.existing = "已有的属性"   # 触发 __setattr__
+    class FullControl:
+        def __init__(self):
+            object.__setattr__(self, "_data", {})
+            self.existing = "已有的属性"   # 触发 __setattr__
 
-    def __getattribute__(self, name):
-        print(f"    1. __getattribute__('{name}') — 每次都触发")
-        try:
-            return object.__getattribute__(self, name)
-        except AttributeError:
-            pass
-        # 找不到时，继续往下走……
-        # Python 会自动调用 __getattr__
+        def __getattribute__(self, name):
+            print(f"    1. __getattribute__('{name}') — 每次都触发")
+            try:
+                return object.__getattribute__(self, name)
+            except AttributeError:
+                pass
+            # 找不到时，继续往下走……
+            # Python 会自动调用 __getattr__
 
-    def __getattr__(self, name):
-        print(f"    2. __getattr__('{name}') — 没找到才触发")
-        return f"默认值 for '{name}'"
+        def __getattr__(self, name):
+            print(f"    2. __getattr__('{name}') — 没找到才触发")
+            return f"默认值 for '{name}'"
 
-    def __setattr__(self, name, value):
-        print(f"    __setattr__('{name}', {value!r})")
-        object.__setattr__(self, name, value)
+        def __setattr__(self, name, value):
+            print(f"    __setattr__('{name}', {value!r})")
+            object.__setattr__(self, name, value)
 
-    def __delattr__(self, name):
-        print(f"    __delattr__('{name}')")
-        object.__delattr__(self, name)
+        def __delattr__(self, name):
+            print(f"    __delattr__('{name}')")
+            object.__delattr__(self, name)
 
-fc = FullControl()
-print("\n  访问存在的属性:")
-_ = fc.existing
-print("\n  访问不存在的属性:")
-_ = fc.missing
-print("\n  设置属性:")
-fc.new_attr = 100
-print("\n  删除属性:")
-del fc.new_attr
+    fc = FullControl()
+    print("\n  访问存在的属性:")
+    _ = fc.existing
+    print("\n  访问不存在的属性:")
+    _ = fc.missing
+    print("\n  设置属性:")
+    fc.new_attr = 100
+    print("\n  删除属性:")
+    del fc.new_attr
+
+
+# ============================================================
+# 入口: 支持跑全部 / 跑单个
+# ============================================================
+if __name__ == "__main__":
+    import sys
+    demos = {
+        "getattr": demo_getattr,
+        "proxy": demo_proxy,
+        "setattr": demo_setattr,
+        "delattr": demo_delattr,
+        "getattribute": demo_getattribute,
+        "order": demo_order,
+    }
+    if len(sys.argv) > 1:
+        fn = demos.get(sys.argv[1])
+        if fn is None:
+            print(f"未知案例 '{sys.argv[1]}', 可选: {', '.join(demos)}")
+            sys.exit(1)
+        fn()
+    else:
+        for fn in demos.values():
+            fn()
 
 
 # ============================================================

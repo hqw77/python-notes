@@ -64,139 +64,188 @@
 
   __call__ 的核心优势：让你的对象"像函数一样"被使用，
   但它有 self，所以能访问自己的属性（状态），也能拥有其他方法。
+
+【运行方式】
+  全部: python 03_callable.py
+  单个: python 03_callable.py counter / adder / memoize / strategy / decorator / check_callable
 """
+
+from functools import partial
+
 
 # ============================================================
 # 1. 基础示例 —— 带状态的函数
 # ============================================================
-class Counter:
-    """每次调用计数器加 1 —— 保存调用次数这个"状态" """
-    def __init__(self):
-        self.count = 0
+def demo_counter():
+    class Counter:
+        """每次调用计数器加 1 —— 保存调用次数这个"状态" """
+        def __init__(self):
+            self.count = 0
 
-    def __call__(self):
-        self.count += 1
-        return self.count
+        def __call__(self):
+            self.count += 1
+            return self.count
 
-counter = Counter()
-print("--- 可调用计数器 ---")
-print(f"  第 1 次调用: {counter()}")   # 1 —— 注意是 counter() 不是 counter.xxx()
-print(f"  第 2 次调用: {counter()}")   # 2
-print(f"  第 3 次调用: {counter()}")   # 3
+    counter = Counter()
+    print("--- 可调用计数器 ---")
+    print(f"  第 1 次调用: {counter()}")   # 1 —— 注意是 counter() 不是 counter.xxx()
+    print(f"  第 2 次调用: {counter()}")   # 2
+    print(f"  第 3 次调用: {counter()}")   # 3
 
 
 # ============================================================
 # 2. 带参数的 __call__
 # ============================================================
-class Adder:
-    """创建一个"加了固定数"的函数"""
-    def __init__(self, n):
-        self.n = n
+def demo_adder():
+    class Adder:
+        """创建一个"加了固定数"的函数"""
+        def __init__(self, n):
+            self.n = n
 
-    def __call__(self, x):
-        return x + self.n
+        def __call__(self, x):
+            return x + self.n
 
-add5 = Adder(5)
-add10 = Adder(10)
-print(f"\n--- 带参数的可调用对象 ---")
-print(f"  add5(10) = {add5(10)}")     # 15
-print(f"  add10(10) = {add10(10)}")   # 20
+    add5 = Adder(5)
+    add10 = Adder(10)
+    print(f"\n--- 带参数的可调用对象 ---")
+    print(f"  add5(10) = {add5(10)}")     # 15
+    print(f"  add10(10) = {add10(10)}")   # 20
 
-# 等价于偏函数（但更灵活）
-from functools import partial
-add5_partial = partial(lambda n, x: x + n, 5)
-print(f"  partial 版本: {add5_partial(10)}")
+    # 等价于偏函数（但更灵活）
+    add5_partial = partial(lambda n, x: x + n, 5)
+    print(f"  partial 版本: {add5_partial(10)}")
 
 
 # ============================================================
 # 3. 实用案例：缓存函数的结果
 # ============================================================
-class Memoize:
-    """记住每次调用的结果，相同输入直接返回缓存（不用重算）"""
-    def __init__(self, func):
-        self.func = func
-        self.cache = {}
+def demo_memoize():
+    class Memoize:
+        """记住每次调用的结果，相同输入直接返回缓存（不用重算）"""
+        def __init__(self, func):
+            self.func = func
+            self.cache = {}
 
-    def __call__(self, *args):
-        if args not in self.cache:
-            self.cache[args] = self.func(*args)
-            print(f"    计算 {args} -> {self.cache[args]}")
-        else:
-            print(f"    命中缓存 {args} -> {self.cache[args]}")
-        return self.cache[args]
+        def __call__(self, *args):
+            if args not in self.cache:
+                self.cache[args] = self.func(*args)
+                print(f"    计算 {args} -> {self.cache[args]}")
+            else:
+                print(f"    命中缓存 {args} -> {self.cache[args]}")
+            return self.cache[args]
 
-def expensive_calc(x):
-    import time
-    time.sleep(0.1)
-    return x ** 2
+    def expensive_calc(x):
+        import time
+        time.sleep(0.1)
+        return x ** 2
 
-memo_calc = Memoize(expensive_calc)
-print("\n--- 带缓存的函数 ---")
-memo_calc(10)    # 计算
-memo_calc(10)    # 命中缓存
-memo_calc(20)    # 计算
+    memo_calc = Memoize(expensive_calc)
+    print("\n--- 带缓存的函数 ---")
+    memo_calc(10)    # 计算
+    memo_calc(10)    # 命中缓存
+    memo_calc(20)    # 计算
 
 
 # ============================================================
 # 4. 实用案例：策略模式
 # ============================================================
-class Discount:
-    """折扣策略 —— 每种折扣是一个可调用对象"""
-    def __init__(self, rate, name):
-        self.rate = rate
-        self.name = name
+def demo_strategy():
+    class Discount:
+        """折扣策略 —— 每种折扣是一个可调用对象"""
+        def __init__(self, rate, name):
+            self.rate = rate
+            self.name = name
 
-    def __call__(self, price):
-        result = price * (1 - self.rate)
-        print(f"  {self.name}: {price} -> {result:.2f}")
-        return result
+        def __call__(self, price):
+            result = price * (1 - self.rate)
+            print(f"  {self.name}: {price} -> {result:.2f}")
+            return result
 
-print("\n--- 策略模式 ---")
-strategies = [
-    Discount(0.1, "九折"),
-    Discount(0.2, "八折"),
-    Discount(0.5, "五折"),
-]
-price = 100
-for s in strategies:
-    s(price)
+    print("\n--- 策略模式 ---")
+    strategies = [
+        Discount(0.1, "九折"),
+        Discount(0.2, "八折"),
+        Discount(0.5, "五折"),
+    ]
+    price = 100
+    for s in strategies:
+        s(price)
 
 
 # ============================================================
 # 5. 作为装饰器使用
 # ============================================================
-class Logger:
-    """一个可调用类作为装饰器"""
-    def __init__(self, prefix="LOG"):
-        self.prefix = prefix
+def demo_decorator():
+    class Logger:
+        """一个可调用类作为装饰器"""
+        def __init__(self, prefix="LOG"):
+            self.prefix = prefix
 
-    def __call__(self, func):
-        """当装饰器使用时，__call__ 接收被装饰的函数"""
-        def wrapper(*args, **kwargs):
-            print(f"[{self.prefix}] 调用 {func.__name__}({args}, {kwargs})")
-            result = func(*args, **kwargs)
-            print(f"[{self.prefix}] 返回 {result}")
-            return result
-        return wrapper
+        def __call__(self, func):
+            """当装饰器使用时，__call__ 接收被装饰的函数"""
+            def wrapper(*args, **kwargs):
+                print(f"[{self.prefix}] 调用 {func.__name__}({args}, {kwargs})")
+                result = func(*args, **kwargs)
+                print(f"[{self.prefix}] 返回 {result}")
+                return result
+            return wrapper
 
-print("\n--- 可调用类作为装饰器 ---")
+    print("\n--- 可调用类作为装饰器 ---")
 
-@Logger("TEST")
-def add(a, b):
-    return a + b
+    @Logger("TEST")
+    def add(a, b):
+        return a + b
 
-add(3, 5)
+    add(3, 5)
 
 
 # ============================================================
 # 6. 检查一个对象是否可调用
 # ============================================================
-print(f"\n--- 检查是否可调用 ---")
-print(f"  函数 add: {callable(add)}")                     # True
-print(f"  类 Counter: {callable(Counter)}")               # True —— 类本身也是可调用的
-print(f"  实例 counter: {callable(counter)}")             # True —— 因为有 __call__
-print(f"  普通对象: {callable('hello')}")                  # False
-print(f"  lambda: {callable(lambda x: x)}")               # True
+def demo_check_callable():
+    def add(a, b):
+        return a + b
+
+    class Counter:
+        def __init__(self):
+            self.count = 0
+
+        def __call__(self):
+            self.count += 1
+            return self.count
+
+    counter = Counter()
+
+    print(f"\n--- 检查是否可调用 ---")
+    print(f"  函数 add: {callable(add)}")                     # True
+    print(f"  类 Counter: {callable(Counter)}")               # True —— 类本身也是可调用的
+    print(f"  实例 counter: {callable(counter)}")             # True —— 因为有 __call__
+    print(f"  普通对象: {callable('hello')}")                  # False
+    print(f"  lambda: {callable(lambda x: x)}")               # True
+
+
+# ============================================================
+# 入口: 支持跑全部 / 跑单个
+# ============================================================
+if __name__ == "__main__":
+    import sys
+    demos = {
+        "counter": demo_counter,
+        "adder": demo_adder,
+        "memoize": demo_memoize,
+        "strategy": demo_strategy,
+        "decorator": demo_decorator,
+        "check_callable": demo_check_callable,
+    }
+    if len(sys.argv) > 1:
+        fn = demos.get(sys.argv[1])
+        if fn is None:
+            print(f"未知案例 '{sys.argv[1]}', 可选: {', '.join(demos)}")
+            sys.exit(1)
+        fn()
+    else:
+        for fn in demos.values():
+            fn()
 
 
 # ============================================================

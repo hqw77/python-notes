@@ -53,105 +53,148 @@
     a = 257; b = 257; a is b  # False (超出范围, 各自创建新对象)
 
   但不要依赖这个行为! 它只是 CPython 的实现细节, 其他 Python 实现未必如此。
+
+【运行方式】
+  全部: python 01_variables.py
+  单个: python 01_variables.py label / type / convert / multi / is_ / naming
 """
 
-# ============================================================
-# 1. 变量赋值 —— 标签, 不是盒子
-# ============================================================
-print("--- 变量是标签 ---")
-x = 10
-y = x           # y 指向和 x 同一个对象, 不是复制
-print(f"  x={x}, y={y}, 是同一个对象: {x is y}")
-
-x = 20           # x 换了个标签, y 不受影响
-print(f"  x 改为 20 后: x={x}, y={y}")
-# 理解: 不是"把盒子里 10 改成 20", 而是 x 放弃了 10, 贴到 20 上
 
 # ============================================================
-# 2. 基本类型与 type()
+# 案例 1: 变量赋值 —— 标签, 不是盒子
 # ============================================================
-print("\n--- 基本类型 ---")
-a_int = 42
-a_float = 3.14
-a_str = "hello"
-a_bool = True
-a_none = None
+def demo_label():
+    print("--- 变量是标签 ---")
+    x = 10
+    y = x           # y 指向和 x 同一个对象, 不是复制
+    print(f"  x={x}, y={y}, 是同一个对象: {x is y}")
 
-print(f"  {a_int=}, 类型: {type(a_int).__name__}")
-print(f"  {a_float=}, 类型: {type(a_float).__name__}")
-print(f"  {a_str=}, 类型: {type(a_str).__name__}")
-print(f"  {a_bool=}, 类型: {type(a_bool).__name__}")
-print(f"  {a_none=}, 类型: {type(a_none).__name__}")
+    x = 20           # x 换了个标签, y 不受影响
+    print(f"  x 改为 20 后: x={x}, y={y}")
+    # 理解: 不是"把盒子里 10 改成 20", 而是 x 放弃了 10, 贴到 20 上
 
-# isinstance() —— 安全判断类型 (支持继承)
-print(f"\n  isinstance(42, int): {isinstance(42, int)}")
-print(f"  isinstance(True, int): {isinstance(True, int)}")   # True! bool 是 int 的子类
-print(f"  isinstance(True, bool): {isinstance(True, bool)}")
-print(f"  isinstance(3.14, (int, float)): {isinstance(3.14, (int, float))}")  # 第二个参数可以是元组
 
 # ============================================================
-# 3. 类型转换
+# 案例 2: 基本类型与 type()
 # ============================================================
-print("\n--- 类型转换 ---")
-print(f"  int('42') = {int('42')}")
-print(f"  float('3.14') = {float('3.14')}")
-print(f"  str(100) = {str(100)!r}")     # !r 看到引号
-print(f"  bool(0) = {bool(0)}")         # 0 → False
-print(f"  bool(1) = {bool(1)}")         # 非 0 → True
-print(f"  bool('') = {bool('')}")       # 空字符串 → False
-print(f"  bool('hello') = {bool('hello')}")  # 非空 → True
+def demo_type():
+    print("--- 基本类型 ---")
+    a_int = 42
+    a_float = 3.14
+    a_str = "hello"
+    a_bool = True
+    a_none = None
 
-# ============================================================
-# 4. 多变量赋值
-# ============================================================
-print("\n--- 多变量赋值 ---")
-a = b = c = 0         # 三个变量指向同一个 0 对象
-print(f"  链式赋值: a={a}, b={b}, c={c}")
+    print(f"  {a_int=}, 类型: {type(a_int).__name__}")
+    print(f"  {a_float=}, 类型: {type(a_float).__name__}")
+    print(f"  {a_str=}, 类型: {type(a_str).__name__}")
+    print(f"  {a_bool=}, 类型: {type(a_bool).__name__}")
+    print(f"  {a_none=}, 类型: {type(a_none).__name__}")
 
-x, y = 1, 2           # 元组拆包
-print(f"  拆包赋值: x={x}, y={y}")
+    # isinstance() —— 安全判断类型 (支持继承)
+    print(f"\n  isinstance(42, int): {isinstance(42, int)}")
+    print(f"  isinstance(True, int): {isinstance(True, int)}")   # True! bool 是 int 的子类
+    print(f"  isinstance(True, bool): {isinstance(True, bool)}")
+    print(f"  isinstance(3.14, (int, float)): {isinstance(3.14, (int, float))}")  # 第二个参数可以是元组
 
-x, y = y, x           # 交换变量 (不需要临时变量!)
-print(f"  交换后: x={x}, y={y}")
-
-# ============================================================
-# 5. id() 内存地址与 is
-# ============================================================
-print("\n--- is vs == ---")
-a = [1, 2, 3]
-b = [1, 2, 3]
-print(f"  a == b: {a == b}")     # True —— 内容相同
-print(f"  a is b: {a is b}")     # False —— 不是同一个对象
-print(f"  id(a) = {id(a)}")
-print(f"  id(b) = {id(b)}")
-
-# None 必须用 is
-x = None
-print(f"\n  x is None: {x is None}")   # True —— 正确写法
-print(f"  x == None: {x == None}")     # True —— 能工作但不推荐
-
-# 小整数缓存
-print("\n--- 小整数缓存 (-5 ~ 256) ---")
-print(f"  256 is 256: {256 is 256}")    # True
-print(f"  257 is 257: {257 is 257}")    # 结果取决于实现, CPython 也是 True (同语句编译优化)
-
-a = 257
-b = 257
-print(f"  a is b (各自赋值 257): {a is b}")  # 可能 True 也可能 False, 不要依赖
 
 # ============================================================
-# 6. 命名规范
+# 案例 3: 类型转换
 # ============================================================
-# 变量: snake_case
-user_name = "Alice"
-total_count = 100
+def demo_convert():
+    print("--- 类型转换 ---")
+    print(f"  int('42') = {int('42')}")
+    print(f"  float('3.14') = {float('3.14')}")
+    print(f"  str(100) = {str(100)!r}")     # !r 看到引号
+    print(f"  bool(0) = {bool(0)}")         # 0 → False
+    print(f"  bool(1) = {bool(1)}")         # 非 0 → True
+    print(f"  bool('') = {bool('')}")       # 空字符串 → False
+    print(f"  bool('hello') = {bool('hello')}")  # 非空 → True
 
-# 常量: UPPER_CASE (约定, 不是强制)
-MAX_SIZE = 1024
-PI = 3.14159
 
-# 不能以数字开头, 不能有空格, 不能用保留字 (if, for, class 等)
-# 双下划线开头结尾是 Python 自己的 (__init__, __str__), 自己写的变量不要这样命名
+# ============================================================
+# 案例 4: 多变量赋值
+# ============================================================
+def demo_multi():
+    print("--- 多变量赋值 ---")
+    a = b = c = 0         # 三个变量指向同一个 0 对象
+    print(f"  链式赋值: a={a}, b={b}, c={c}")
+
+    x, y = 1, 2           # 元组拆包
+    print(f"  拆包赋值: x={x}, y={y}")
+
+    x, y = y, x           # 交换变量 (不需要临时变量!)
+    print(f"  交换后: x={x}, y={y}")
+
+
+# ============================================================
+# 案例 5: id() 内存地址与 is
+# ============================================================
+def demo_is():
+    print("--- is vs == ---")
+    a = [1, 2, 3]
+    b = [1, 2, 3]
+    print(f"  a == b: {a == b}")     # True —— 内容相同
+    print(f"  a is b: {a is b}")     # False —— 不是同一个对象
+    print(f"  id(a) = {id(a)}")
+    print(f"  id(b) = {id(b)}")
+
+    # None 必须用 is
+    x = None
+    print(f"\n  x is None: {x is None}")   # True —— 正确写法
+    print(f"  x == None: {x == None}")     # True —— 能工作但不推荐
+
+    # 小整数缓存
+    print("\n--- 小整数缓存 (-5 ~ 256) ---")
+    print(f"  256 is 256: {256 is 256}")    # True
+    print(f"  257 is 257: {257 is 257}")    # 结果取决于实现, CPython 也是 True (同语句编译优化)
+
+    a = 257
+    b = 257
+    print(f"  a is b (各自赋值 257): {a is b}")  # 可能 True 也可能 False, 不要依赖
+
+
+# ============================================================
+# 案例 6: 命名规范
+# ============================================================
+def demo_naming():
+    print("--- 命名规范 ---")
+    # 变量: snake_case
+    user_name = "Alice"
+    total_count = 100
+
+    # 常量: UPPER_CASE (约定, 不是强制)
+    MAX_SIZE = 1024
+    PI = 3.14159
+
+    print(f"  snake_case 变量: {user_name}, {total_count}")
+    print(f"  UPPER_CASE 常量: {MAX_SIZE}, {PI}")
+    print("  规则: 不能以数字开头, 不能用保留字, 不要用双下划线开头结尾")
+
+
+# ============================================================
+# 入口: 支持跑全部 / 跑单个
+# ============================================================
+if __name__ == "__main__":
+    import sys
+    demos = {
+        "label": demo_label,
+        "type": demo_type,
+        "convert": demo_convert,
+        "multi": demo_multi,
+        "is_": demo_is,
+        "naming": demo_naming,
+    }
+    if len(sys.argv) > 1:
+        fn = demos.get(sys.argv[1])
+        if fn is None:
+            print(f"未知案例 '{sys.argv[1]}', 可选: {', '.join(demos)}")
+            sys.exit(1)
+        fn()
+    else:
+        for fn in demos.values():
+            fn()
+
 
 # ============================================================
 # 总结

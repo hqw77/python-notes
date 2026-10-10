@@ -1,4 +1,4 @@
-"""
+'''
 字符串操作 —— Python 中最常用的数据类型之一
 
 【字符串的本质】
@@ -38,139 +38,187 @@
   读写文件/网络传输时需要编解码:
     str.encode("utf-8")  → bytes  (字符串 → 字节, 用于输出)
     bytes.decode("utf-8") → str   (字节 → 字符串, 用于输入)
-"""
+
+【运行方式】
+  全部: python 02_strings.py
+  单个: python 02_strings.py create / slice / immutable / methods / split_join / format / iterate / encoding
+'''
+
 
 # ============================================================
-# 1. 创建方式与转义
+# 案例 1: 创建方式与转义
 # ============================================================
-print("--- 创建方式 ---")
-s1 = '单引号'
-s2 = "双引号, 里面可以有'single quotes'"
-s3 = """三引号可以
+def demo_create():
+    print("--- 创建方式 ---")
+    s1 = '单引号'
+    s2 = "双引号, 里面可以有'single quotes'"
+    s3 = """三引号可以
 跨多行"""
-print(f"  s1: {s1}")
-print(f"  s2: {s2}")
-print(f"  s3: {s3}")
+    print(f"  s1: {s1}")
+    print(f"  s2: {s2}")
+    print(f"  s3: {s3}")
 
-print("\n--- 转义字符 ---")
-print(f"  \\n 换行\n  \\t 制表\t符")
-print(f"  \\\\ 反斜杠: \\")
-print(f"  \\\" 双引号: \"")
+    print("\n--- 转义字符 ---")
+    print(f"  \\n 换行\n  \\t 制表\t符")
+    print(f"  \\\\ 反斜杠: \\")
+    print(f"  \\\" 双引号: \"")
 
-# raw 字符串: 反斜杠就是反斜杠, 不转义 (正则表达式和 Windows 路径常用)
-path = r"C:\Users\test"
-print(f"  实际 raw 路径: {path}")
+    # raw 字符串: 反斜杠就是反斜杠, 不转义 (正则表达式和 Windows 路径常用)
+    path = r"C:\Users\test"
+    print(f"  实际 raw 路径: {path}")
 
-# ============================================================
-# 2. 索引与切片
-# ============================================================
-s = "Python"
-print(f"\n--- 索引与切片 ---")
-print(f"  原字符串: {s!r}")
-print(f"  s[0] = {s[0]!r}")          # P
-print(f"  s[-1] = {s[-1]!r}")        # n
-print(f"  s[0:3] = {s[0:3]!r}")      # Pyt
-print(f"  s[2:] = {s[2:]!r}")        # thon
-print(f"  s[:3] = {s[:3]!r}")        # Pyt
-print(f"  s[::-1] = {s[::-1]!r}")    # nohtyP —— 反转字符串
-print(f"  s[::2] = {s[::2]!r}")      # Pto —— 隔一个取一个
-print(f"  s[-3:] = {s[-3:]!r}")      # hon —— 最后三个字符
 
 # ============================================================
-# 3. 不可变性
+# 案例 2: 索引与切片
 # ============================================================
-print(f"\n--- 不可变性 ---")
-try:
-    s[0] = "X"
-except TypeError as e:
-    print(f"  s[0] = 'X' → TypeError: {e}")
+def demo_slice():
+    s = "Python"
+    print("--- 索引与切片 ---")
+    print(f"  原字符串: {s!r}")
+    print(f"  s[0] = {s[0]!r}")          # P
+    print(f"  s[-1] = {s[-1]!r}")        # n
+    print(f"  s[0:3] = {s[0:3]!r}")      # Pyt
+    print(f"  s[2:] = {s[2:]!r}")        # thon
+    print(f"  s[:3] = {s[:3]!r}")        # Pyt
+    print(f"  s[::-1] = {s[::-1]!r}")    # nohtyP —— 反转字符串
+    print(f"  s[::2] = {s[::2]!r}")      # Pto —— 隔一个取一个
+    print(f"  s[-3:] = {s[-3:]!r}")      # hon —— 最后三个字符
 
-# 正确做法: 创建新字符串
-new_s = "J" + s[1:]
-print(f"  创建新字符串: {new_s}")    # Jython
-
-# ============================================================
-# 4. 常用方法
-# ============================================================
-print("\n--- 大小写 ---")
-print(f"  'Hello'.upper() = {'Hello'.upper()!r}")
-print(f"  'Hello'.lower() = {'Hello'.lower()!r}")
-print(f"  'hello world'.title() = {'hello world'.title()!r}")
-
-print("\n--- 去除空白 ---")
-print(f"  '  hi  '.strip() = {'  hi  '.strip()!r}")
-print(f"  '  hi  '.lstrip() = {'  hi  '.lstrip()!r}")
-print(f"  '  hi  '.rstrip() = {'  hi  '.rstrip()!r}")
-
-print("\n--- 查找与替换 ---")
-print(f"  'hello'.find('l') = {'hello'.find('l')}")       # 2 (第一个 l 的索引)
-print(f"  'hello'.find('x') = {'hello'.find('x')}")       # -1 (找不到)
-print(f"  'hello'.index('l') = {'hello'.index('l')}")     # 2 (和 find 一样, 但找不到会抛 ValueError)
-print(f"  'hello'.startswith('he') = {'hello'.startswith('he')}")
-print(f"  'hello'.endswith('lo') = {'hello'.endswith('lo')}")
-print(f"  'hello'.replace('l', 'L') = {'hello'.replace('l', 'L')!r}")
-
-print("\n--- 判断类方法 ---")
-print(f"  '123'.isdigit() = {'123'.isdigit()}")
-print(f"  'abc'.isalpha() = {'abc'.isalpha()}")
-print(f"  'abc123'.isalnum() = {'abc123'.isalnum()}")
-print(f"  '  '.isspace() = {'  '.isspace()}")
 
 # ============================================================
-# 5. split() 与 join() —— 互为逆操作
+# 案例 3: 不可变性
 # ============================================================
-print("\n--- split(): 字符串 → 列表 ---")
-csv_line = "apple,banana,orange"
-print(f"  '{csv_line}'.split(',') = {csv_line.split(',')}")
-print(f"  'a b  c'.split() = {'a b  c'.split()!r}")        # 默认按空白分割
-print(f"  'a,b,c'.split(',', 1) = {'a,b,c'.split(',', 1)}")  # 只分 1 次
+def demo_immutable():
+    s = "Python"
+    print("--- 不可变性 ---")
+    try:
+        s[0] = "X"
+    except TypeError as e:
+        print(f"  s[0] = 'X' → TypeError: {e}")
 
-print("\n--- join(): 列表 → 字符串 ---")
-fruits = ['apple', 'banana', 'orange']
-print(f"  ','.join({fruits}) = {','.join(fruits)!r}")
-print(f"  ' -> '.join({fruits}) = {' -> '.join(fruits)!r}")
+    # 正确做法: 创建新字符串
+    new_s = "J" + s[1:]
+    print(f"  创建新字符串: {new_s}")    # Jython
 
-# join 比 + 拼接高效得多:
-# "a" + "b" + "c" → 创建 2 个中间字符串对象
-# "".join(["a", "b", "c"]) → 先算总长度, 一次分配内存
 
 # ============================================================
-# 6. 字符串格式化
+# 案例 4: 常用方法
 # ============================================================
-name, age = "Alice", 25
+def demo_methods():
+    print("--- 大小写 ---")
+    print(f"  'Hello'.upper() = {'Hello'.upper()!r}")
+    print(f"  'Hello'.lower() = {'Hello'.lower()!r}")
+    print(f"  'hello world'.title() = {'hello world'.title()!r}")
 
-print("\n--- 字符串格式化 ---")
-# f-string (Python 3.6+, 推荐)
-print(f"  f-string: 我叫{name}, 今年{age}岁")
-print(f"  f-string 表达式: {age} 年后 {age + 5}")
-print(f"  f-string 格式化: {3.14159:.2f}")   # 保留 2 位小数
+    print("\n--- 去除空白 ---")
+    print(f"  '  hi  '.strip() = {'  hi  '.strip()!r}")
+    print(f"  '  hi  '.lstrip() = {'  hi  '.lstrip()!r}")
+    print(f"  '  hi  '.rstrip() = {'  hi  '.rstrip()!r}")
 
-# .format() (Python 2.6+, 兼容)
-print("  .format: 我叫{}, 今年{}岁".format(name, age))
-print("  .format 命名: 我叫{n}, 今年{a}岁".format(n=name, a=age))
+    print("\n--- 查找与替换 ---")
+    print(f"  'hello'.find('l') = {'hello'.find('l')}")       # 2 (第一个 l 的索引)
+    print(f"  'hello'.find('x') = {'hello'.find('x')}")       # -1 (找不到)
+    print(f"  'hello'.index('l') = {'hello'.index('l')}")     # 2 (和 find 一样, 但找不到会抛 ValueError)
+    print(f"  'hello'.startswith('he') = {'hello'.startswith('he')}")
+    print(f"  'hello'.endswith('lo') = {'hello'.endswith('lo')}")
+    print(f"  'hello'.replace('l', 'L') = {'hello'.replace('l', 'L')!r}")
 
-# % 格式化 (旧式, 不推荐新代码使用)
-print("  %% 格式化: 我叫%s, 今年%d岁" % (name, age))
+    print("\n--- 判断类方法 ---")
+    print(f"  '123'.isdigit() = {'123'.isdigit()}")
+    print(f"  'abc'.isalpha() = {'abc'.isalpha()}")
+    print(f"  'abc123'.isalnum() = {'abc123'.isalnum()}")
+    print(f"  '  '.isspace() = {'  '.isspace()}")
+
 
 # ============================================================
-# 7. 遍历与计数
+# 案例 5: split() 与 join() —— 互为逆操作
 # ============================================================
-print("\n--- 遍历字符串 ---")
-for i, ch in enumerate("ABC"):
-    print(f"    s[{i}] = {ch!r}")
+def demo_split_join():
+    print("--- split(): 字符串 → 列表 ---")
+    csv_line = "apple,banana,orange"
+    print(f"  '{csv_line}'.split(',') = {csv_line.split(',')}")
+    print(f"  'a b  c'.split() = {'a b  c'.split()!r}")        # 默认按空白分割
+    print(f"  'a,b,c'.split(',', 1) = {'a,b,c'.split(',', 1)}")  # 只分 1 次
 
-print(f"\n  'hello'.count('l') = {'hello'.count('l')}")   # 2
+    print("\n--- join(): 列表 → 字符串 ---")
+    fruits = ['apple', 'banana', 'orange']
+    print(f"  ','.join({fruits}) = {','.join(fruits)!r}")
+    print(f"  ' -> '.join({fruits}) = {' -> '.join(fruits)!r}")
+
+    # join 比 + 拼接高效得多:
+    # "a" + "b" + "c" → 创建 2 个中间字符串对象
+    # "".join(["a", "b", "c"]) → 先算总长度, 一次分配内存
+
 
 # ============================================================
-# 8. 编码
+# 案例 6: 字符串格式化
 # ============================================================
-print(f"\n--- 编码 ---")
-chinese = "你好"
-print(f"  ord('A') = {ord('A')}")           # 65 (Unicode 码位)
-print(f"  chr(65) = {chr(65)!r}")           # 'A'
-utf8_bytes = chinese.encode("utf-8")
-print(f"  '你好'.encode('utf-8') = {utf8_bytes}")
-print(f"  decode 回来 = {utf8_bytes.decode('utf-8')}")
+def demo_format():
+    name, age = "Alice", 25
+
+    print("--- 字符串格式化 ---")
+    # f-string (Python 3.6+, 推荐)
+    print(f"  f-string: 我叫{name}, 今年{age}岁")
+    print(f"  f-string 表达式: {age} 年后 {age + 5}")
+    print(f"  f-string 格式化: {3.14159:.2f}")   # 保留 2 位小数
+
+    # .format() (Python 2.6+, 兼容)
+    print("  .format: 我叫{}, 今年{}岁".format(name, age))
+    print("  .format 命名: 我叫{n}, 今年{a}岁".format(n=name, a=age))
+
+    # % 格式化 (旧式, 不推荐新代码使用)
+    print("  %% 格式化: 我叫%s, 今年%d岁" % (name, age))
+
+
+# ============================================================
+# 案例 7: 遍历与计数
+# ============================================================
+def demo_iterate():
+    print("--- 遍历字符串 ---")
+    for i, ch in enumerate("ABC"):
+        print(f"    s[{i}] = {ch!r}")
+
+    print(f"\n  'hello'.count('l') = {'hello'.count('l')}")   # 2
+
+
+# ============================================================
+# 案例 8: 编码
+# ============================================================
+def demo_encoding():
+    print("--- 编码 ---")
+    chinese = "你好"
+    print(f"  ord('A') = {ord('A')}")           # 65 (Unicode 码位)
+    print(f"  chr(65) = {chr(65)!r}")           # 'A'
+    utf8_bytes = chinese.encode("utf-8")
+    print(f"  '你好'.encode('utf-8') = {utf8_bytes}")
+    print(f"  decode 回来 = {utf8_bytes.decode('utf-8')}")
+
+
+# ============================================================
+# 入口: 支持跑全部 / 跑单个
+# ============================================================
+if __name__ == "__main__":
+    import sys
+    demos = {
+        "create": demo_create,
+        "slice": demo_slice,
+        "immutable": demo_immutable,
+        "methods": demo_methods,
+        "split_join": demo_split_join,
+        "format": demo_format,
+        "iterate": demo_iterate,
+        "encoding": demo_encoding,
+    }
+    if len(sys.argv) > 1:
+        fn = demos.get(sys.argv[1])
+        if fn is None:
+            print(f"未知案例 '{sys.argv[1]}', 可选: {', '.join(demos)}")
+            sys.exit(1)
+        fn()
+    else:
+        for fn in demos.values():
+            fn()
+
 
 # ============================================================
 # 总结

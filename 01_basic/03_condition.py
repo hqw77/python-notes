@@ -46,147 +46,184 @@
     - 匹配类型
     - 解构序列/映射
     - 带守卫条件 (if 子句)
+
+【运行方式】
+  全部: python 03_condition.py
+  单个: python 03_condition.py if_else / comparison / membership / truthy / ternary / short_circuit / match / all_any
 """
 
 # ============================================================
 # 1. if / elif / else 基本语法
 # ============================================================
-print("--- 基本条件判断 ---")
-score = 85
+def demo_if_else():
+    print("--- 基本条件判断 ---")
+    score = 85
 
-if score >= 90:
-    grade = "A"
-elif score >= 80:
-    grade = "B"
-elif score >= 70:
-    grade = "C"
-elif score >= 60:
-    grade = "D"
-else:
-    grade = "F"
+    if score >= 90:
+        grade = "A"
+    elif score >= 80:
+        grade = "B"
+    elif score >= 70:
+        grade = "C"
+    elif score >= 60:
+        grade = "D"
+    else:
+        grade = "F"
 
-print(f"  分数 {score} → 等级 {grade}")
+    print(f"  分数 {score} → 等级 {grade}")
 
 # ============================================================
 # 2. 比较运算符与逻辑运算符
 # ============================================================
-print("\n--- 比较与逻辑 ---")
-x, y = 10, 20
-print(f"  x == y: {x == y}")
-print(f"  x != y: {x != y}")
-print(f"  x < y: {x < y}")
-print(f"  x > y: {x > y}")
+def demo_comparison():
+    print("\n--- 比较与逻辑 ---")
+    x, y = 10, 20
+    print(f"  x == y: {x == y}")
+    print(f"  x != y: {x != y}")
+    print(f"  x < y: {x < y}")
+    print(f"  x > y: {x > y}")
 
-# 逻辑运算
-print(f"  x > 5 and y < 30: {x > 5 and y < 30}")     # True
-print(f"  x > 15 or y < 10: {x > 15 or y < 10}")    # False
-print(f"  not x > 15: {not x > 15}")                 # True
+    # 逻辑运算
+    print(f"  x > 5 and y < 30: {x > 5 and y < 30}")     # True
+    print(f"  x > 15 or y < 10: {x > 15 or y < 10}")    # False
+    print(f"  not x > 15: {not x > 15}")                 # True
 
 # ============================================================
 # 3. 成员运算符与身份运算符
 # ============================================================
-print("\n--- 成员 in / not in ---")
-fruits = ["apple", "banana", "orange"]
-print(f"  'apple' in {fruits}: {'apple' in fruits}")
-print(f"  'grape' not in {fruits}: {'grape' not in fruits}")
+def demo_membership():
+    print("\n--- 成员 in / not in ---")
+    fruits = ["apple", "banana", "orange"]
+    print(f"  'apple' in {fruits}: {'apple' in fruits}")
+    print(f"  'grape' not in {fruits}: {'grape' not in fruits}")
 
-print("\n--- 身份 is / is not ---")
-a = [1, 2, 3]
-b = a
-c = [1, 2, 3]
-print(f"  a is b: {a is b}")      # True (同一个对象)
-print(f"  a is c: {a is c}")      # False (不同对象)
-print(f"  a is not c: {a is not c}")
+    print("\n--- 身份 is / is not ---")
+    a = [1, 2, 3]
+    b = a
+    c = [1, 2, 3]
+    print(f"  a is b: {a is b}")      # True (同一个对象)
+    print(f"  a is c: {a is c}")      # False (不同对象)
+    print(f"  a is not c: {a is not c}")
 
 # ============================================================
 # 4. 真值判断 (Falsy values)
 # ============================================================
-print("\n--- Falsy 值 ---")
-falsy_values = [0, 0.0, "", [], {}, (), set(), None, False]
-for v in falsy_values:
-    print(f"  bool({v!r}) = {bool(v)}")
+def demo_truthy():
+    print("\n--- Falsy 值 ---")
+    falsy_values = [0, 0.0, "", [], {}, (), set(), None, False]
+    for v in falsy_values:
+        print(f"  bool({v!r}) = {bool(v)}")
 
-print("\n  if lst: 代替 if len(lst) > 0:")
-items = []
-if not items:           # Pythonic 写法
-    print("    列表为空")
-# 不推荐: if len(items) == 0:  ← 啰嗦且慢
+    print("\n  if lst: 代替 if len(lst) > 0:")
+    items = []
+    if not items:           # Pythonic 写法
+        print("    列表为空")
+    # 不推荐: if len(items) == 0:  ← 啰嗦且慢
 
 # ============================================================
 # 5. 三元表达式
 # ============================================================
-print("\n--- 三元表达式 ---")
-age = 18
-status = "成年" if age >= 18 else "未成年"
-print(f"  age={age} → {status}")
+def demo_ternary():
+    print("\n--- 三元表达式 ---")
+    age = 18
+    status = "成年" if age >= 18 else "未成年"
+    print(f"  age={age} → {status}")
 
-# 等价于:
-# if age >= 18:
-#     status = "成年"
-# else:
-#     status = "未成年"
+    # 等价于:
+    # if age >= 18:
+    #     status = "成年"
+    # else:
+    #     status = "未成年"
 
 # ============================================================
 # 6. 短路求值
 # ============================================================
-print("\n--- 短路求值 ---")
+def demo_short_circuit():
+    print("\n--- 短路求值 ---")
 
-def yes(): print("    yes() 被调用"); return True
-def no():  print("    no() 被调用"); return False
+    def yes(): print("    yes() 被调用"); return True
+    def no():  print("    no() 被调用"); return False
 
-print("  no() and yes():")
-result = no() and yes()    # yes() 不会被执行!
-print(f"    结果: {result}")
+    print("  no() and yes():")
+    result = no() and yes()    # yes() 不会被执行!
+    print(f"    结果: {result}")
 
-print("  yes() or no():")
-result = yes() or no()     # no() 不会被执行!
-print(f"    结果: {result}")
+    print("  yes() or no():")
+    result = yes() or no()     # no() 不会被执行!
+    print(f"    结果: {result}")
 
-# and/or 返回的是对象, 不是 True/False
-print(f"\n  0 or 'hello' = {0 or 'hello'!r}")
-print(f"  100 and 200 = {100 and 200}")
-print(f"  '' or 'default' = {'' or 'default'!r}")
+    # and/or 返回的是对象, 不是 True/False
+    print(f"\n  0 or 'hello' = {0 or 'hello'!r}")
+    print(f"  100 and 200 = {100 and 200}")
+    print(f"  '' or 'default' = {'' or 'default'!r}")
 
 # ============================================================
 # 7. match / case (Python 3.10+)
 # ============================================================
-print("\n--- match/case ---")
+def demo_match():
+    print("\n--- match/case ---")
 
-def handle_command(command):
-    match command.split():
-        case ["quit"]:
-            return "退出"
-        case ["help"]:
-            return "帮助信息"
-        case ["add", a, b]:           # 解构列表
-            return f"结果: {int(a) + int(b)}"
-        case _:                        # _ 匹配任何东西
-            return "未知命令"
+    def handle_command(command):
+        match command.split():
+            case ["quit"]:
+                return "退出"
+            case ["help"]:
+                return "帮助信息"
+            case ["add", a, b]:           # 解构列表
+                return f"结果: {int(a) + int(b)}"
+            case _:                        # _ 匹配任何东西
+                return "未知命令"
 
-print(f"  'quit' → {handle_command('quit')!r}")
-print(f"  'add 3 5' → {handle_command('add 3 5')!r}")
-print(f"  'xyz' → {handle_command('xyz')!r}")
+    print(f"  'quit' → {handle_command('quit')!r}")
+    print(f"  'add 3 5' → {handle_command('add 3 5')!r}")
+    print(f"  'xyz' → {handle_command('xyz')!r}")
 
 # ============================================================
 # 8. 实用技巧: all() / any()
 # ============================================================
-print("\n--- all() / any() ---")
-# all(): 所有条件都满足
-numbers = [10, 20, 30]
-if all(n > 0 for n in numbers):
-    print("  所有数字都大于 0")
+def demo_all_any():
+    print("\n--- all() / any() ---")
+    # all(): 所有条件都满足
+    numbers = [10, 20, 30]
+    if all(n > 0 for n in numbers):
+        print("  所有数字都大于 0")
 
-# any(): 任意一个条件满足
-if any(n > 25 for n in numbers):
-    print("  至少有一个数字大于 25")
+    # any(): 任意一个条件满足
+    if any(n > 25 for n in numbers):
+        print("  至少有一个数字大于 25")
 
-# 用 in 代替多个 or (更简洁更易维护)
-fruit = "apple"
-if fruit == "apple" or fruit == "banana" or fruit == "orange":  # 啰嗦
-    pass
+    # 用 in 代替多个 or (更简洁更易维护)
+    fruit = "apple"
+    if fruit == "apple" or fruit == "banana" or fruit == "orange":  # 啰嗦
+        pass
 
-if fruit in ("apple", "banana", "orange"):   # 简洁
-    print(f"  {fruit} 在列表中")
+    if fruit in ("apple", "banana", "orange"):   # 简洁
+        print(f"  {fruit} 在列表中")
+
+# ============================================================
+# 入口: 支持跑全部 / 跑单个
+# ============================================================
+if __name__ == "__main__":
+    import sys
+    demos = {
+        "if_else": demo_if_else,
+        "comparison": demo_comparison,
+        "membership": demo_membership,
+        "truthy": demo_truthy,
+        "ternary": demo_ternary,
+        "short_circuit": demo_short_circuit,
+        "match": demo_match,
+        "all_any": demo_all_any,
+    }
+    if len(sys.argv) > 1:
+        fn = demos.get(sys.argv[1])
+        if fn is None:
+            print(f"未知案例 '{sys.argv[1]}', 可选: {', '.join(demos)}")
+            sys.exit(1)
+        fn()
+    else:
+        for fn in demos.values():
+            fn()
 
 # ============================================================
 # 总结

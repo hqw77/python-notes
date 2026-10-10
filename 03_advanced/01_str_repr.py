@@ -54,91 +54,129 @@
     f"{obj}"    默认用 __str__
     f"{obj!s}"  强制用 __str__
     f"{obj!r}"  强制用 __repr__（调试时很常用）
+
+【运行方式】
+  全部: python 01_str_repr.py
+  单个: python 01_str_repr.py repr_only / str_and_repr / default / dataclass / tips
 """
 
-# ============================================================
-# 1. 只有 __repr__（没有 __str__）
-# ============================================================
-class PointV1:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def __repr__(self):
-        # repr 的标准格式：ClassName(参数=值, ...)
-        return f"PointV1(x={self.x}, y={self.y})"
-
-p1 = PointV1(3, 4)
-print("--- 只有 __repr__ ---")
-print(f"  print(): {p1}")                # PointV1(x=3, y=4) — 没有 __str__，降级用 __repr__
-print(f"  repr():  {repr(p1)}")          # PointV1(x=3, y=4)
-
-
-# ============================================================
-# 2. 同时有 __str__ 和 __repr__
-# ============================================================
-class PointV2:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def __repr__(self):
-        return f"PointV2(x={self.x}, y={self.y})"    # 给开发者：精确
-
-    def __str__(self):
-        return f"({self.x}, {self.y})"               # 给用户：可读
-
-p2 = PointV2(3, 4)
-print("\n--- 同时有 __str__ 和 __repr__ ---")
-print(f"  print(): {p2}")                # (3, 4) — 调用 __str__
-print(f"  repr():  {repr(p2)}")          # PointV2(x=3, y=4) — 调用 __repr__
-
-# 在交互环境中直接输入变量名 → 显示 __repr__
-# >>> p2
-# PointV2(x=3, y=4)
-
-
-# ============================================================
-# 3. 什么都没有 —— 默认行为
-# ============================================================
-class PointV3:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-p3 = PointV3(3, 4)
-print("\n--- 什么都没有（默认） ---")
-print(f"  print(): {p3}")                # <__main__.PointV3 object at 0x...>
-# 默认显示 类名 + 内存地址，几乎没用
-
-
-# ============================================================
-# 4. dataclass 自动生成（实际项目最推荐的方式）
-# ============================================================
 from dataclasses import dataclass
 
+
+# ============================================================
+# 共享类 (第 4、5 节共用): dataclass 自动生成
+# ============================================================
 @dataclass                       # 自动生成 __init__ __repr__ __eq__ 等方法
 class Point:
     x: int
     y: int
 
-p = Point(3, 4)
-print(f"\n--- dataclass 自动生成 ---")
-print(f"  {p}")                 # Point(x=3, y=4)
+
+# ============================================================
+# 1. 只有 __repr__（没有 __str__）
+# ============================================================
+def demo_repr_only():
+    class PointV1:
+        def __init__(self, x, y):
+            self.x = x
+            self.y = y
+
+        def __repr__(self):
+            # repr 的标准格式：ClassName(参数=值, ...)
+            return f"PointV1(x={self.x}, y={self.y})"
+
+    p1 = PointV1(3, 4)
+    print("--- 只有 __repr__ ---")
+    print(f"  print(): {p1}")                # PointV1(x=3, y=4) — 没有 __str__，降级用 __repr__
+    print(f"  repr():  {repr(p1)}")          # PointV1(x=3, y=4)
+
+
+# ============================================================
+# 2. 同时有 __str__ 和 __repr__
+# ============================================================
+def demo_str_and_repr():
+    class PointV2:
+        def __init__(self, x, y):
+            self.x = x
+            self.y = y
+
+        def __repr__(self):
+            return f"PointV2(x={self.x}, y={self.y})"    # 给开发者：精确
+
+        def __str__(self):
+            return f"({self.x}, {self.y})"               # 给用户：可读
+
+    p2 = PointV2(3, 4)
+    print("\n--- 同时有 __str__ 和 __repr__ ---")
+    print(f"  print(): {p2}")                # (3, 4) — 调用 __str__
+    print(f"  repr():  {repr(p2)}")          # PointV2(x=3, y=4) — 调用 __repr__
+
+    # 在交互环境中直接输入变量名 → 显示 __repr__
+    # >>> p2
+    # PointV2(x=3, y=4)
+
+
+# ============================================================
+# 3. 什么都没有 —— 默认行为
+# ============================================================
+def demo_default():
+    class PointV3:
+        def __init__(self, x, y):
+            self.x = x
+            self.y = y
+
+    p3 = PointV3(3, 4)
+    print("\n--- 什么都没有（默认） ---")
+    print(f"  print(): {p3}")                # <__main__.PointV3 object at 0x...>
+    # 默认显示 类名 + 内存地址，几乎没用
+
+
+# ============================================================
+# 4. dataclass 自动生成（实际项目最推荐的方式）
+# ============================================================
+def demo_dataclass():
+    p = Point(3, 4)
+    print(f"\n--- dataclass 自动生成 ---")
+    print(f"  {p}")                 # Point(x=3, y=4)
 
 
 # ============================================================
 # 5. 实用技巧
 # ============================================================
-# 容器类（list/dict）会用子元素的 __repr__ 来显示自身
-print(f"\n--- 容器中的显示 ---")
-print(f"  {[Point(1, 2), Point(3, 4)]}")
-# [Point(x=1, y=2), Point(x=3, y=4)] — 用元素的 __repr__
+def demo_tips():
+    p = Point(3, 4)
+    # 容器类（list/dict）会用子元素的 __repr__ 来显示自身
+    print(f"\n--- 容器中的显示 ---")
+    print(f"  {[Point(1, 2), Point(3, 4)]}")
+    # [Point(x=1, y=2), Point(x=3, y=4)] — 用元素的 __repr__
 
-# 格式化输出时也可以用
-print(f"\n--- f-string 中的 !r 和 !s ---")
-print(f"  !r 强制用 repr: {p!r}")     # Point(x=3, y=4)
-print(f"  !s 强制用 str:  {p!s}")     # Point(x=3, y=4)  (dataclass 两者一样)
+    # 格式化输出时也可以用
+    print(f"\n--- f-string 中的 !r 和 !s ---")
+    print(f"  !r 强制用 repr: {p!r}")     # Point(x=3, y=4)
+    print(f"  !s 强制用 str:  {p!s}")     # Point(x=3, y=4)  (dataclass 两者一样)
+
+
+# ============================================================
+# 入口: 支持跑全部 / 跑单个
+# ============================================================
+if __name__ == "__main__":
+    import sys
+    demos = {
+        "repr_only": demo_repr_only,
+        "str_and_repr": demo_str_and_repr,
+        "default": demo_default,
+        "dataclass": demo_dataclass,
+        "tips": demo_tips,
+    }
+    if len(sys.argv) > 1:
+        fn = demos.get(sys.argv[1])
+        if fn is None:
+            print(f"未知案例 '{sys.argv[1]}', 可选: {', '.join(demos)}")
+            sys.exit(1)
+        fn()
+    else:
+        for fn in demos.values():
+            fn()
 
 
 # ============================================================

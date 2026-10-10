@@ -29,120 +29,154 @@
   2. 嵌套超过 2 层 → 用 for 循环
   3. 需要副作用 (如写入文件, 修改外部变量) → 用 for 循环
   4. 异常处理 → 用 for 循环
+
+【运行方式】
+  全部: python 09_comprehension.py
+  单个: python 09_comprehension.py list_comp / dict_comp / set_comp / generator / nested / best_practice
 """
+
+import sys
+import math
 
 # ============================================================
 # 1. 列表推导式
 # ============================================================
-print("--- 列表推导式 ---")
+def demo_list_comp():
+    print("--- 列表推导式 ---")
 
-# 基础: 对每个元素做变换
-squares = [x**2 for x in range(5)]
-print(f"  平方: {squares}")           # [0, 1, 4, 9, 16]
+    # 基础: 对每个元素做变换
+    squares = [x**2 for x in range(5)]
+    print(f"  平方: {squares}")           # [0, 1, 4, 9, 16]
 
-# 带条件过滤
-evens = [x for x in range(10) if x % 2 == 0]
-print(f"  偶数: {evens}")
+    # 带条件过滤
+    evens = [x for x in range(10) if x % 2 == 0]
+    print(f"  偶数: {evens}")
 
-# 带条件变换 (if-else 在左边)
-labels = ["even" if x % 2 == 0 else "odd" for x in range(4)]
-print(f"  标签: {labels}")
+    # 带条件变换 (if-else 在左边)
+    labels = ["even" if x % 2 == 0 else "odd" for x in range(4)]
+    print(f"  标签: {labels}")
 
-# 等价 for 循环对比
-result = []
-for x in range(10):
-    if x % 2 == 0:
-        result.append(x)
+    # 等价 for 循环对比
+    result = []
+    for x in range(10):
+        if x % 2 == 0:
+            result.append(x)
 
-result2 = [x for x in range(10) if x % 2 == 0]
-assert result == result2
-print(f"  等价性验证: {result == result2}")
+    result2 = [x for x in range(10) if x % 2 == 0]
+    assert result == result2
+    print(f"  等价性验证: {result == result2}")
 
 # ============================================================
 # 2. 字典推导式
 # ============================================================
-print("\n--- 字典推导式 ---")
+def demo_dict_comp():
+    print("\n--- 字典推导式 ---")
 
-# key: value 对
-square_map = {x: x**2 for x in range(5)}
-print(f"  x → x^2: {square_map}")
+    # key: value 对
+    square_map = {x: x**2 for x in range(5)}
+    print(f"  x → x^2: {square_map}")
 
-# 从已有字典过滤
-d = {"a": 1, "b": 2, "c": 3}
-filtered = {k: v for k, v in d.items() if v > 1}
-print(f"  过滤 value > 1: {filtered}")
+    # 从已有字典过滤
+    d = {"a": 1, "b": 2, "c": 3}
+    filtered = {k: v for k, v in d.items() if v > 1}
+    print(f"  过滤 value > 1: {filtered}")
 
 # ============================================================
 # 3. 集合推导式
 # ============================================================
-print("\n--- 集合推导式 ---")
+def demo_set_comp():
+    print("\n--- 集合推导式 ---")
 
-# 自动去重
-words = ["hello", "world", "hello"]
-unique_lengths = {len(w) for w in words}
-print(f"  单词长度 (去重): {unique_lengths}")   # {5}
+    # 自动去重
+    words = ["hello", "world", "hello"]
+    unique_lengths = {len(w) for w in words}
+    print(f"  单词长度 (去重): {unique_lengths}")   # {5}
 
 # ============================================================
 # 4. 生成器表达式 (不是推导式!)
 # ============================================================
-print("\n--- 生成器表达式 ---")
+def demo_generator():
+    print("\n--- 生成器表达式 ---")
 
-# 用 () 而不是 [], 惰性生成, 不占内存
-gen = (x**2 for x in range(10))
-print(f"  生成器对象: {gen}")
-print(f"  取前 3 个: {next(gen)}, {next(gen)}, {next(gen)}")
-print(f"  剩下的: {list(gen)}")
+    # 用 () 而不是 [], 惰性生成, 不占内存
+    gen = (x**2 for x in range(10))
+    print(f"  生成器对象: {gen}")
+    print(f"  取前 3 个: {next(gen)}, {next(gen)}, {next(gen)}")
+    print(f"  剩下的: {list(gen)}")
 
-# 大小对比
-import sys
-list_comp = [x**2 for x in range(1000000)]
-gen_expr = (x**2 for x in range(1000000))
-print(f"\n  列表推导式内存: {sys.getsizeof(list_comp):,} 字节")
-print(f"  生成器表达式内存: {sys.getsizeof(gen_expr)} 字节 (几乎不占)")
+    # 大小对比
+    list_comp = [x**2 for x in range(1000000)]
+    gen_expr = (x**2 for x in range(1000000))
+    print(f"\n  列表推导式内存: {sys.getsizeof(list_comp):,} 字节")
+    print(f"  生成器表达式内存: {sys.getsizeof(gen_expr)} 字节 (几乎不占)")
 
 # ============================================================
 # 5. 嵌套推导式
 # ============================================================
-print("\n--- 嵌套推导式 ---")
+def demo_nested():
+    print("\n--- 嵌套推导式 ---")
 
-# 展平二维列表
-matrix = [[1, 2], [3, 4], [5, 6]]
-flat = [item for row in matrix for item in row]
-print(f"  展平: {flat}")
+    # 展平二维列表
+    matrix = [[1, 2], [3, 4], [5, 6]]
+    flat = [item for row in matrix for item in row]
+    print(f"  展平: {flat}")
 
-# 等价 for 循环 (更容易理解)
-flat2 = []
-for row in matrix:
-    for item in row:
-        flat2.append(item)
-print(f"  等价 for: {flat2}")
+    # 等价 for 循环 (更容易理解)
+    flat2 = []
+    for row in matrix:
+        for item in row:
+            flat2.append(item)
+    print(f"  等价 for: {flat2}")
 
-# 注: 嵌套推导式的执行顺序就是 for 循环的顺序, 从左到右
-# [item for row in matrix for item in row]
-#  相当于 for row in matrix: for item in row: result.append(item)
+    # 注: 嵌套推导式的执行顺序就是 for 循环的顺序, 从左到右
+    # [item for row in matrix for item in row]
+    #  相当于 for row in matrix: for item in row: result.append(item)
 
 # ============================================================
 # 6. 推导式最佳实践
 # ============================================================
-print("\n--- 最佳实践 ---")
+def demo_best_practice():
+    print("\n--- 最佳实践 ---")
 
-# ✓ 好的推导式 (简单, 一目了然)
-names = [user["name"] for user in
-    [{"name": "Alice"}, {"name": "Bob"}]]
-print(f"  简单推导: {names}")
+    # ✓ 好的推导式 (简单, 一目了然)
+    names = [user["name"] for user in
+        [{"name": "Alice"}, {"name": "Bob"}]]
+    print(f"  简单推导: {names}")
 
-# ✗ 不好的推导式 (太复杂, 应该用 for 循环)
-# result = [x for x in range(100) if x % 2 == 0 if x % 5 == 0 if x > 10]
-# 这种多层过滤应该用 for + if 链
+    # ✗ 不好的推导式 (太复杂, 应该用 for 循环)
+    # result = [x for x in range(100) if x % 2 == 0 if x % 5 == 0 if x > 10]
+    # 这种多层过滤应该用 for + if 链
 
-# 海象运算符 := (Python 3.8+)
-# 在推导式中避免重复计算
-import math
-# 不好: sqrt 算了两次
-# roots = [math.sqrt(x) for x in range(10) if math.sqrt(x) > 2]
-# 好: sqrt 只算一次
-roots = [r for x in range(10) if (r := math.sqrt(x)) > 2]
-print(f"  海象运算符: {roots}")
+    # 海象运算符 := (Python 3.8+)
+    # 在推导式中避免重复计算
+    # 不好: sqrt 算了两次
+    # roots = [math.sqrt(x) for x in range(10) if math.sqrt(x) > 2]
+    # 好: sqrt 只算一次
+    roots = [r for x in range(10) if (r := math.sqrt(x)) > 2]
+    print(f"  海象运算符: {roots}")
+
+# ============================================================
+# 入口: 支持跑全部 / 跑单个
+# ============================================================
+if __name__ == "__main__":
+    import sys
+    demos = {
+        "list_comp": demo_list_comp,
+        "dict_comp": demo_dict_comp,
+        "set_comp": demo_set_comp,
+        "generator": demo_generator,
+        "nested": demo_nested,
+        "best_practice": demo_best_practice,
+    }
+    if len(sys.argv) > 1:
+        fn = demos.get(sys.argv[1])
+        if fn is None:
+            print(f"未知案例 '{sys.argv[1]}', 可选: {', '.join(demos)}")
+            sys.exit(1)
+        fn()
+    else:
+        for fn in demos.values():
+            fn()
 
 # ============================================================
 # 总结

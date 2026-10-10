@@ -79,6 +79,10 @@
 
   在你的 __eq__ 里，遇到不认识的类型应该 return NotImplemented，
   而不是 raise NotImplementedError。
+
+【运行方式】
+  全部: python 04_comparison.py
+  单个: python 04_comparison.py eq / sort / total_ordering / chained / version / not_implemented
 """
 
 from functools import total_ordering
@@ -86,174 +90,204 @@ from functools import total_ordering
 # ============================================================
 # 1. 基础：实现 == 比较
 # ============================================================
-class Student:
-    def __init__(self, name, score):
-        self.name = name
-        self.score = score
+def demo_eq():
+    class Student:
+        def __init__(self, name, score):
+            self.name = name
+            self.score = score
 
-    def __eq__(self, other):
-        """self == other 时调用"""
-        if not isinstance(other, Student):
-            return NotImplemented   # 返回 NotImplemented 让 Python 尝试 other.__eq__(self)
-        return self.name == other.name and self.score == other.score
+        def __eq__(self, other):
+            """self == other 时调用"""
+            if not isinstance(other, Student):
+                return NotImplemented   # 返回 NotImplemented 让 Python 尝试 other.__eq__(self)
+            return self.name == other.name and self.score == other.score
 
-    def __repr__(self):
-        return f"Student({self.name!r}, {self.score})"
+        def __repr__(self):
+            return f"Student({self.name!r}, {self.score})"
 
-s1 = Student("Alice", 90)
-s2 = Student("Alice", 90)
-s3 = Student("Bob", 85)
+    s1 = Student("Alice", 90)
+    s2 = Student("Alice", 90)
+    s3 = Student("Bob", 85)
 
-print("--- 基础相等比较 ---")
-print(f"  s1 == s2: {s1 == s2}")     # True —— 数据相同
-print(f"  s1 == s3: {s1 == s3}")     # False
+    print("--- 基础相等比较 ---")
+    print(f"  s1 == s2: {s1 == s2}")     # True —— 数据相同
+    print(f"  s1 == s3: {s1 == s3}")     # False
 
-# 没有 __eq__ 时，== 比较的是内存地址（is）
-# 有了 __eq__，== 比较的是你定义的逻辑
+    # 没有 __eq__ 时，== 比较的是内存地址（is）
+    # 有了 __eq__，== 比较的是你定义的逻辑
 
 
 # ============================================================
 # 2. 排序比较 —— 谁成绩更高？
 # ============================================================
-class StudentV2:
-    def __init__(self, name, score):
-        self.name = name
-        self.score = score
+def demo_sort():
+    class StudentV2:
+        def __init__(self, name, score):
+            self.name = name
+            self.score = score
 
-    def __eq__(self, other):
-        if not isinstance(other, StudentV2):
-            return NotImplemented
-        return self.score == other.score
+        def __eq__(self, other):
+            if not isinstance(other, StudentV2):
+                return NotImplemented
+            return self.score == other.score
 
-    def __lt__(self, other):
-        """self < other —— 小于"""
-        if not isinstance(other, StudentV2):
-            return NotImplemented
-        return self.score < other.score
+        def __lt__(self, other):
+            """self < other —— 小于"""
+            if not isinstance(other, StudentV2):
+                return NotImplemented
+            return self.score < other.score
 
-    def __le__(self, other):
-        """self <= other —— 小于等于"""
-        if not isinstance(other, StudentV2):
-            return NotImplemented
-        return self.score <= other.score
+        def __le__(self, other):
+            """self <= other —— 小于等于"""
+            if not isinstance(other, StudentV2):
+                return NotImplemented
+            return self.score <= other.score
 
-    def __gt__(self, other):
-        """self > other —— 大于"""
-        if not isinstance(other, StudentV2):
-            return NotImplemented
-        return self.score > other.score
+        def __gt__(self, other):
+            """self > other —— 大于"""
+            if not isinstance(other, StudentV2):
+                return NotImplemented
+            return self.score > other.score
 
-    def __ge__(self, other):
-        """self >= other —— 大于等于"""
-        if not isinstance(other, StudentV2):
-            return NotImplemented
-        return self.score >= other.score
+        def __ge__(self, other):
+            """self >= other —— 大于等于"""
+            if not isinstance(other, StudentV2):
+                return NotImplemented
+            return self.score >= other.score
 
-    def __repr__(self):
-        return f"StudentV2({self.name!r}, {self.score})"
+        def __repr__(self):
+            return f"StudentV2({self.name!r}, {self.score})"
 
-students = [
-    StudentV2("Alice", 90),
-    StudentV2("Bob", 85),
-    StudentV2("Charlie", 95),
-]
-print(f"\n--- 排序比较 ---")
-print(f"  排序前: {students}")
-print(f"  按成绩排序后: {sorted(students)}")         # sorted() 内部用 __lt__
-print(f"  最高分: {max(students)}")                   # max() 也用比较方法
-print(f"  Alice > Bob: {students[0] > students[1]}")
+    students = [
+        StudentV2("Alice", 90),
+        StudentV2("Bob", 85),
+        StudentV2("Charlie", 95),
+    ]
+    print(f"\n--- 排序比较 ---")
+    print(f"  排序前: {students}")
+    print(f"  按成绩排序后: {sorted(students)}")         # sorted() 内部用 __lt__
+    print(f"  最高分: {max(students)}")                   # max() 也用比较方法
+    print(f"  Alice > Bob: {students[0] > students[1]}")
 
 
 # ============================================================
 # 3. @total_ordering —— 偷懒写法，只写两个方法
 # ============================================================
-@total_ordering
-class StudentV3:
-    """只写了 __eq__ 和 __lt__，其他比较方法自动生成"""
-    def __init__(self, name, score):
-        self.name = name
-        self.score = score
+def demo_total_ordering():
+    @total_ordering
+    class StudentV3:
+        """只写了 __eq__ 和 __lt__，其他比较方法自动生成"""
+        def __init__(self, name, score):
+            self.name = name
+            self.score = score
 
-    def __eq__(self, other):
-        if not isinstance(other, StudentV3):
-            return NotImplemented
-        return self.score == other.score
+        def __eq__(self, other):
+            if not isinstance(other, StudentV3):
+                return NotImplemented
+            return self.score == other.score
 
-    def __lt__(self, other):
-        if not isinstance(other, StudentV3):
-            return NotImplemented
-        return self.score < other.score
+        def __lt__(self, other):
+            if not isinstance(other, StudentV3):
+                return NotImplemented
+            return self.score < other.score
 
-    def __repr__(self):
-        return f"StudentV3({self.name!r}, {self.score})"
+        def __repr__(self):
+            return f"StudentV3({self.name!r}, {self.score})"
 
-a, b = StudentV3("A", 80), StudentV3("B", 90)
-print(f"\n--- @total_ordering 自动生成 ---")
-print(f"  a == b: {a == b}")    # 你写的 __eq__
-print(f"  a < b:  {a < b}")     # 你写的 __lt__
-print(f"  a > b:  {a > b}")     # 自动生成
-print(f"  a <= b: {a <= b}")    # 自动生成
-print(f"  a >= b: {a >= b}")    # 自动生成
-print(f"  a != b: {a != b}")    # 自动生成（__eq__ 的反值）
+    a, b = StudentV3("A", 80), StudentV3("B", 90)
+    print(f"\n--- @total_ordering 自动生成 ---")
+    print(f"  a == b: {a == b}")    # 你写的 __eq__
+    print(f"  a < b:  {a < b}")     # 你写的 __lt__
+    print(f"  a > b:  {a > b}")     # 自动生成
+    print(f"  a <= b: {a <= b}")    # 自动生成
+    print(f"  a >= b: {a >= b}")    # 自动生成
+    print(f"  a != b: {a != b}")    # 自动生成（__eq__ 的反值）
 
 
 # ============================================================
 # 4. 链式比较 (Python 特有)
 # ============================================================
-# a < b < c  等价于  a < b and b < c（但 b 只计算一次）
-print(f"\n--- 链式比较 ---")
-score = 85
-print(f"  60 < score < 100: {60 < score < 100}")     # True
+def demo_chained():
+    # a < b < c  等价于  a < b and b < c（但 b 只计算一次）
+    print(f"\n--- 链式比较 ---")
+    score = 85
+    print(f"  60 < score < 100: {60 < score < 100}")     # True
 
 
 # ============================================================
 # 5. 实用案例：版本号比较
 # ============================================================
-@total_ordering
-class Version:
-    """语义化版本号，支持比较"""
-    def __init__(self, version_str):
-        parts = version_str.split(".")
-        self.major, self.minor, self.patch = map(int, parts)
+def demo_version():
+    @total_ordering
+    class Version:
+        """语义化版本号，支持比较"""
+        def __init__(self, version_str):
+            parts = version_str.split(".")
+            self.major, self.minor, self.patch = map(int, parts)
 
-    def __eq__(self, other):
-        return (self.major, self.minor, self.patch) == (other.major, other.minor, other.patch)
+        def __eq__(self, other):
+            return (self.major, self.minor, self.patch) == (other.major, other.minor, other.patch)
 
-    def __lt__(self, other):
-        return (self.major, self.minor, self.patch) < (other.major, other.minor, other.patch)
+        def __lt__(self, other):
+            return (self.major, self.minor, self.patch) < (other.major, other.minor, other.patch)
 
-    def __repr__(self):
-        return f"v{self.major}.{self.minor}.{self.patch}"
+        def __repr__(self):
+            return f"v{self.major}.{self.minor}.{self.patch}"
 
-print(f"\n--- 版本号比较 ---")
-v1, v2, v3 = Version("1.2.3"), Version("1.10.0"), Version("2.0.0")
-print(f"  {v1} < {v2}: {v1 < v2}")    # True
-print(f"  {v2} < {v3}: {v2 < v3}")    # True
-print(f"  排序: {sorted([v3, v1, v2])}")
+    print(f"\n--- 版本号比较 ---")
+    v1, v2, v3 = Version("1.2.3"), Version("1.10.0"), Version("2.0.0")
+    print(f"  {v1} < {v2}: {v1 < v2}")    # True
+    print(f"  {v2} < {v3}: {v2 < v3}")    # True
+    print(f"  排序: {sorted([v3, v1, v2])}")
 
 
 # ============================================================
 # 6. NotImplemented vs NotImplementedError
 # ============================================================
-# NotImplemented（不是异常）: 返回给 Python 说"我不会处理这个类型"
-#   → Python 会尝试交换操作数，调 other.__eq__(self)
-# NotImplementedError（是异常）: 表示子类还没有实现这个方法
-print(f"\n--- NotImplemented 的作用 ---")
+def demo_not_implemented():
+    # NotImplemented（不是异常）: 返回给 Python 说"我不会处理这个类型"
+    #   → Python 会尝试交换操作数，调 other.__eq__(self)
+    # NotImplementedError（是异常）: 表示子类还没有实现这个方法
+    class IntWrapper:
+        def __init__(self, value):
+            self.value = value
 
-class IntWrapper:
-    def __init__(self, value):
-        self.value = value
+        def __eq__(self, other):
+            if isinstance(other, IntWrapper):
+                return self.value == other.value
+            if isinstance(other, int):
+                return self.value == other
+            return NotImplemented     # 告诉 Python "我处理不了，你试试别的"
 
-    def __eq__(self, other):
-        if isinstance(other, IntWrapper):
-            return self.value == other.value
-        if isinstance(other, int):
-            return self.value == other
-        return NotImplemented     # 告诉 Python "我处理不了，你试试别的"
+    print(f"\n--- NotImplemented 的作用 ---")
 
-w = IntWrapper(5)
-print(f"  w == IntWrapper(5): {w == IntWrapper(5)}")   # True
-print(f"  w == 5: {w == 5}")                           # True（Python 自动处理）
+    w = IntWrapper(5)
+    print(f"  w == IntWrapper(5): {w == IntWrapper(5)}")   # True
+    print(f"  w == 5: {w == 5}")                           # True（Python 自动处理）
+
+
+# ============================================================
+# 入口: 支持跑全部 / 跑单个
+# ============================================================
+if __name__ == "__main__":
+    import sys
+    demos = {
+        "eq": demo_eq,
+        "sort": demo_sort,
+        "total_ordering": demo_total_ordering,
+        "chained": demo_chained,
+        "version": demo_version,
+        "not_implemented": demo_not_implemented,
+    }
+    if len(sys.argv) > 1:
+        fn = demos.get(sys.argv[1])
+        if fn is None:
+            print(f"未知案例 '{sys.argv[1]}', 可选: {', '.join(demos)}")
+            sys.exit(1)
+        fn()
+    else:
+        for fn in demos.values():
+            fn()
 
 
 # ============================================================
