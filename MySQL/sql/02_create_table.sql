@@ -1,0 +1,8 @@
+USE py_adv_db;
+
+CREATE TABLE IF NOT EXISTS students (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL,
+    age INT,
+    email VARCHAR(100) UNIQUE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
