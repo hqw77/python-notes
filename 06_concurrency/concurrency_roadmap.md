@@ -43,12 +43,13 @@
 
 ---
 
-## 第四梯队：协程进阶 + 选型（收尾）
+## 第四梯队：协程基础 → 协程进阶 → 选型（收尾）
 
 | 序号 | 特性 | 文件 | 核心内容 | 能干啥 |
 |---|---|---|---|---|
-| 09 | 协程进阶 | `09_coroutine_deep.py` | `asyncio.to_thread`、`run_in_executor`、混用 | 协程 + 线程/进程协同 |
-| 10 | 选型决策树 | `10_how_to_choose.py` | 线程 vs 进程 vs 协程对比 | 面试高频，收尾总结 |
+| 09 | 协程基础 | `09_async_basics.py` | `async/await`、`gather`、`create_task`、`async for/with` | 协程入门 |
+| 10 | 协程进阶 | `10_coroutine_deep.py` | `asyncio.to_thread`、`run_in_executor`、混用 | 协程 + 线程/进程协同 |
+| 11 | 选型决策树 | `11_how_to_choose.py` | 线程 vs 进程 vs 协程对比 | 面试高频，收尾总结 |
 
 ---
 

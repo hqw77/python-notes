@@ -9,9 +9,9 @@
 |---|---|---|---|
 | 01 | [01_collections.py](01_collections.py) | namedtuple、Counter、defaultdict、deque、OrderedDict、ChainMap + 日志分析实战 | ✅ 7 个案例 |
 | 02 | [02_functools.py](02_functools.py) | lru_cache、cached_property、partial、wraps、singledispatch、total_ordering、cmp_to_key、reduce | ✅ 9 个案例 |
-| 03 | 03_pathlib.py | Path 拼接、属性、遍历、读写、resolve、与 os.path 对比 | 📝 待补 |
-| 04 | 04_json_csv.py | dumps/loads、ensure_ascii、default、DictReader/DictWriter、BOM、大文件 | 📝 待补 |
-| 05 | 05_logging.py | 级别、Logger、Handler、Formatter、轮转、父子 logger | 📝 待补 |
+| 03 | [03_pathlib.py](03_pathlib.py) | 拼接与拆解、查询遍历、读写、增删改、与 os.path 对照、扫描目录实战 | ✅ 7 个案例 |
+| 04 | [04_json_csv.py](04_json_csv.py) | JSON 序列化/反序列化、datetime 处理、CSV 读写、BOM、大文件流式、CSV→JSON 实战 | ✅ 7 个案例 |
+| 05 | [05_logging.py](05_logging.py) | 级别过滤、Logger 层级、Handler + Formatter、轮转、异常堆栈、通用配置实战 | ✅ 8 个案例 |
 
 ## 为什么只留 5 个
 

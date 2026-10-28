@@ -99,9 +99,9 @@ pytest                            # 运行测试
 |---|---|---|---|
 | 01 | 01_collections.py | namedtuple、Counter、defaultdict、deque、OrderedDict、ChainMap + 日志分析实战 | ✅ 7 个案例 |
 | 02 | 02_functools.py | lru_cache、cached_property、partial、wraps、singledispatch、total_ordering、cmp_to_key、reduce | ✅ 9 个案例 |
-| 03 | 03_pathlib.py | 现代路径操作 | 📝 待补 |
-| 04 | 04_json_csv.py | JSON / CSV 序列化 | 📝 待补 |
-| 05 | 05_logging.py | 日志模块 | 📝 待补 |
+| 03 | 03_pathlib.py | 路径拼接与拆解、遍历查询、读写、增删改、与 os.path 对照 | ✅ 7 个案例 |
+| 04 | 04_json_csv.py | JSON 序列化、datetime 处理、CSV 读写、BOM、大文件流式 | ✅ 7 个案例 |
+| 05 | 05_logging.py | 级别、Logger 层级、Handler + Formatter、轮转、异常堆栈 | ✅ 8 个案例 |
 
 > 迭代器协议与上下文管理器属于语言特性，已归入 [`03_advanced/`](03_advanced/)（`11_iterator.py`、`12_context_manager.py`）。
 
@@ -132,8 +132,8 @@ pytest                            # 运行测试
 | 07 | 07_process_comm.py | 进程间通信 Queue / Pipe / Manager | ✅ |
 | 08 | 08_process_pool.py | ProcessPoolExecutor、pickle 约束 | ✅ |
 | 09 | 09_async_basics.py | 协程基础：async/await、gather、create_task | ✅ |
-| 09 | 09_coroutine_deep.py | 协程进阶：as_completed、timeout、to_thread | ✅ |
-| 10 | 10_how_to_choose.py | 线程 vs 进程 vs 协程 选型决策树 | ✅ |
+| 10 | 10_coroutine_deep.py | 协程进阶：as_completed、timeout、to_thread | ✅ |
+| 11 | 11_how_to_choose.py | 线程 vs 进程 vs 协程 选型决策树 | ✅ |
 
 配套资料：
 

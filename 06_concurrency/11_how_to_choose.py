@@ -51,8 +51,8 @@
    - 协程最轻量, 适合高并发 I/O, 但必须配合 async 生态"
 
 【运行方式】
-  全部: python 10_how_to_choose.py
-  单个: python 10_how_to_choose.py io / cpu / interview
+  全部: python 11_how_to_choose.py
+  单个: python 11_how_to_choose.py io / cpu / interview
 """
 
 import time

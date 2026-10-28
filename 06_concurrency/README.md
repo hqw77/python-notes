@@ -14,8 +14,9 @@
 | 06 | 06_multiprocessing.py | Process、绕过 GIL | ✅ 有案例 |
 | 07 | 07_process_comm.py | 进程间通信 Queue/Pipe/Manager | ✅ 有案例 |
 | 08 | 08_process_pool.py | ProcessPoolExecutor | ✅ 有案例 |
-| 09 | 09_coroutine_deep.py | 协程进阶、与线程/进程混用 | ✅ 有案例 |
-| 10 | 10_how_to_choose.py | 线程 vs 进程 vs 协程 选型决策树 | ✅ 有案例 |
+| 09 | 09_async_basics.py | 协程基础：async/await、gather、create_task | ✅ 有案例 |
+| 10 | 10_coroutine_deep.py | 协程进阶、与线程/进程混用 | ✅ 有案例 |
+| 11 | 11_how_to_choose.py | 线程 vs 进程 vs 协程 选型决策树 | ✅ 有案例 |
 
 ---
 

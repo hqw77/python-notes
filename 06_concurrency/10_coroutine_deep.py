@@ -2,8 +2,8 @@
 协程进阶 —— asyncio 生态 + 与线程/进程混用
 
 【运行方式】
-  全部: python 09_coroutine_deep.py
-  单个: python 09_coroutine_deep.py completed / timeout / to_thread / bug / executor
+  全部: python 10_coroutine_deep.py
+  单个: python 10_coroutine_deep.py completed / timeout / to_thread / bug / executor
 """
 
 import asyncio
