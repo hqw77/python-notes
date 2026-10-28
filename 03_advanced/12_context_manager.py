@@ -12,10 +12,11 @@ with 语句用于简化资源管理，确保资源在使用后被正确释放。
 - 临时状态恢复
 
 【运行方式】
-  全部: python with.py
-  单个: python with.py basic / protocol / flow / timer / temp_attr / lock / contextlib / nested / exit_control / async
+  全部: python 12_context_manager.py
+  单个: python 12_context_manager.py basic / protocol / flow / timer / temp_attr / lock / contextlib / nested / exit_control / async
 """
 
+import os
 import time
 import threading
 from contextlib import contextmanager, ContextDecorator, suppress, ExitStack
@@ -25,17 +26,22 @@ from contextlib import contextmanager, ContextDecorator, suppress, ExitStack
 # 1. 基本用法 —— 文件操作（最常见的例子）
 # ============================================================
 def demo_basic():
+    import tempfile
+    path = os.path.join(tempfile.gettempdir(), "context_demo.txt")
+
     # 不加 with —— 需要手动 close，异常时可能忘记关闭
-    f = open("test.txt", "w")
+    f = open(path, "w")
     try:
         f.write("hello")
     finally:
         f.close()                     # 必须手动关闭
+    print(f"  try/finally 写入 {path}，手动关闭完成")
 
     # 加了 with —— 自动关闭，简洁安全
-    with open("test.txt", "w") as f:
+    with open(path, "w") as f:
         f.write("hello")
     # 离开 with 块时，文件自动关闭，即使发生了异常也会关闭
+    print(f"  with 写入 {path}，退出时自动关闭 (closed={f.closed})")
 
 
 # ============================================================

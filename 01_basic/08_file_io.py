@@ -8,7 +8,7 @@
   # 离开 with 块, 文件自动关闭, 即使发生异常也会关闭
 
   永远用 with, 不要手动 f.close().
-  这是上下文管理器的核心应用 (详见 03_advanced/with.py).
+  这是上下文管理器的核心应用 (详见 03_advanced/12_context_manager.py).
 
 【文件模式速查】
 

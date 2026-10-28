@@ -16,7 +16,7 @@
     3. 遇到 StopIteration 异常时停止
 
   所以 for 循环不限于 list/str, 任何可迭代对象都能 for.
-  (详见 03_advanced/iterator.py)
+  (详见 03_advanced/11_iterator.py)
 
 【range -- 不是 list!】
 

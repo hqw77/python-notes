@@ -4,8 +4,8 @@
 
 | 序号 | 特性         | 文件          | 核心内容                              |
 | ---- | ------------ | ------------- | ------------------------------------- |
-| -    | 迭代器协议   | `iterator.py` | `__iter__` `__next__` `StopIteration` |
-| -    | 上下文管理器 | `with.py`     | `__enter__` `__exit__` `contextlib`   |
+| -    | 迭代器协议   | `11_iterator.py` | `__iter__` `__next__` `StopIteration` |
+| -    | 上下文管理器 | `12_context_manager.py`     | `__enter__` `__exit__` `contextlib`   |
 
 ---
 

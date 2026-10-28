@@ -71,7 +71,7 @@ pytest                            # 运行测试
 
 ## 第三阶段：进阶特性 `03_advanced/`
 
-十个魔术方法/语法专题，每个都有完整案例，配套 [README.md](03_advanced/README.md)（487 行，接近一本速查手册）。
+十二个专题：两种协议（迭代器、上下文管理器）+ 十个魔术方法与语法特性，每个都有完整案例。配套 [README.md](03_advanced/README.md)（487 行，接近一本速查手册）。
 
 | # | 文件 | 内容 | 状态 |
 |---|---|---|---|
@@ -85,8 +85,8 @@ pytest                            # 运行测试
 | 08 | 08_attribute_access.py | __getattr__ / __setattr__ / __getattribute__ | ✅ |
 | 09 | 09_generator_advanced.py | yield from / send() / 协程 | ✅ |
 | 10 | 10_async_basics.py | async / await / asyncio | ✅ |
-
-> 迭代器协议（`iterator.py`）与上下文管理器（`with.py`）的完整案例在 `04_stdlib/`。
+| 11 | 11_iterator.py | 迭代器协议（__iter__ / __next__）、生成器、内置迭代器 | ✅ |
+| 12 | 12_context_manager.py | 上下文管理器（__enter__ / __exit__）、contextlib、嵌套与异常控制 | ✅ |
 
 ---
 
@@ -97,10 +97,10 @@ pytest                            # 运行测试
 | 文件 | 内容 | 行数 |
 |---|---|---|
 | 02_itertools.py | 迭代工具、排列组合、无限迭代器 | 260 |
-| iterator.py | 迭代器协议（__iter__ / __next__）详解 | 233 |
-| with.py | 上下文管理器（__enter__ / __exit__ / contextlib） | 371 |
 
 **大纲待补**（目前只有知识点清单）：`01_collections.py`、`03_functools.py`、`04_pathlib.py`、`05_datetime.py`、`06_regex.py`、`07_json_csv.py`、`08_logging.py`。
+
+> 迭代器协议与上下文管理器属于语言特性，已归入 [`03_advanced/`](03_advanced/)（`11_iterator.py`、`12_context_manager.py`）。
 
 ---
 

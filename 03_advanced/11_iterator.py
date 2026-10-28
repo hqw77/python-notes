@@ -10,8 +10,8 @@
 - 迭代器一定是可迭代对象，但可迭代对象不一定是迭代器
 
 【运行方式】
-  全部: python iterator.py
-  单个: python iterator.py protocol / stopiteration / iterable_vs_iterator / builtin / generator / tips / type_check
+  全部: python 11_iterator.py
+  单个: python 11_iterator.py protocol / stopiteration / iterable_vs_iterator / builtin / generator / tips / type_check
 """
 
 from collections.abc import Iterable, Iterator

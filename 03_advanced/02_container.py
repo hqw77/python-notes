@@ -20,9 +20,9 @@
   │ del obj[key]    │ __delitem__(self,key)│ 删除元素                    │
   │ len(obj)        │ __len__(self)        │ 返回容器内元素个数            │
   │ x in obj        │ __contains__(s,x)    │ 检查 x 是否在容器中           │
-  │ for x in obj    │ __iter__ / __getitem__│ 迭代（见 iterator.py）      │
+  │ for x in obj    │ __iter__ / __getitem__│ 迭代（见 11_iterator.py）      │
   │ reversed(obj)   │ __reversed__         │ 反向迭代（可选）              │
-  │ iter(obj)       │ __iter__             │ 返回迭代器（见 iterator.py）  │
+  │ iter(obj)       │ __iter__             │ 返回迭代器（见 11_iterator.py）  │
   └─────────────────┴──────────────────────┴────────────────────────────┘
 
 【调用链路 —— Python 内部是怎么工作的】

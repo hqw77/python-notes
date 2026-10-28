@@ -21,9 +21,8 @@
 
 ```
 03_advanced/
-├── iter.py                  → 迭代器入门 (yield)
-├── iterator.py              → 迭代器协议详解
-├── with.py                  → 上下文管理器详解
+├── 11_iterator.py           → 迭代器协议（__iter__ / __next__）
+├── 12_context_manager.py    → 上下文管理器（__enter__ / __exit__）
 ├── 01_str_repr.py           → __str__ / __repr__
 ├── 02_container.py          → 容器协议
 ├── 03_callable.py           → __call__
@@ -36,6 +35,8 @@
 ├── 10_async_basics.py       → 异步编程基础
 └── README.md                → 本文件
 ```
+
+> `11_iterator.py`、`12_context_manager.py` 编号排在最后，但内容是协议基础（for / with 的底层），建议最先读。
 
 ## 1. 迭代器协议 (`__iter__` / `__next__`)
 
