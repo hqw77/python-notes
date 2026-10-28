@@ -1,9 +1,9 @@
 """
-封装与属性管理 —— 控制数据的访问方式
+封装与属性管理 -- 控制数据的访问方式
 
-【Python 的封装哲学】
+[Python 的封装哲学]
 
-  "我们都是成年人." —— Python 社区名言
+  "我们都是成年人." -- Python 社区名言
 
   Python 没有真正的 private/protected 关键字. 一切都是公开的.
   封装靠的是约定和信任, 而不是编译器强制.
@@ -12,7 +12,7 @@
   __属性:  双下划线, 名称改写 (name mangling), 防止子类意外覆盖
   __xxx__: 双下划线包围, Python 自己的魔术方法, 自己不要这么命名
 
-【名称改写 (Name Mangling) 的机制】
+[名称改写 (Name Mangling) 的机制]
 
   class Foo:
       def __init__(self):
@@ -21,7 +21,7 @@
   Foo.__secret 不存在! 它在编译期被自动改名为 _Foo__secret.
   目的不是"私有", 而是防止子类意外覆盖同名属性.
 
-【什么时候用 @property? 装饰器】
+[什么时候用 @property? 装饰器]
 
   1. 计算属性 (derived attribute): area 由 radius 计算, 不需要单独存储
   2. 数据验证: 赋值时检查值的合法性
@@ -30,7 +30,7 @@
   但不要过度使用: 如果只是简单的 get/set, 没有验证逻辑,
   直接暴露属性名更好 (Pythonic).
 
-【运行方式】
+[运行方式]
   全部: python 03_encapsulation.py
   单个: python 03_encapsulation.py underscore / property / property_func / backcompat
 """
@@ -75,7 +75,7 @@ def demo_property():
 
         @property                       # getter: c.radius 看起来像直接读属性
         def radius(self):
-            """半径 —— 可读可写"""
+            """半径 -- 可读可写"""
             return self._radius
 
         @radius.setter                  # setter: c.radius = 5 触发这个方法
@@ -91,12 +91,12 @@ def demo_property():
 
         @property                       # 只读属性 (只有 getter, 没有 setter)
         def area(self):
-            """面积 = πr^2 — 只读"""
+            """面积 = πr^2 - 只读"""
             return 3.14159 * self._radius ** 2
 
         @property
         def diameter(self):
-            """直径 = 2r — 只读"""
+            """直径 = 2r - 只读"""
             return 2 * self._radius
 
     c = Circle(5)

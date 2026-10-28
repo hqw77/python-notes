@@ -1,7 +1,7 @@
 """
-继承与多态 —— 复用和扩展类的行为
+继承与多态 -- 复用和扩展类的行为
 
-【继承是什么?】
+[继承是什么?]
 
   子类继承父类的所有属性和方法, 可以重写 (override) 或扩展.
     class Animal:          # 父类 (基类)
@@ -12,13 +12,13 @@
         def speak(self):   # 重写父类方法
             return "汪汪!"
 
-【为什么要用继承?】
+[为什么要用继承?]
 
   1. 代码复用: 共性放父类, 特性放子类
   2. 多态: 同一接口, 不同行为. dog.speak() 和 cat.speak() 各说各的
   3. 建立类型层级: isinstance(dog, Animal) → True
 
-【Python 的鸭子类型】
+[Python 的鸭子类型]
 
   Python 的多态不强制要求继承. 只要对象有 speak() 方法, 就能当 "会叫的动物" 用.
   这叫"鸭子类型": 如果它走路像鸭子, 叫声像鸭子, 那它就是鸭子.
@@ -26,13 +26,13 @@
   这和 Java 的风格完全不同: Java 必须 implements Speakable 接口才行.
   Python 更灵活, 但也更容易出错 (没有编译期检查).
 
-【super() —— 调用父类方法】
+[super() -- 调用父类方法]
 
   super() 让你在子类中调用父类的同名方法. 常用于:
     1. __init__: 子类先用父类的初始化, 再加自己的逻辑
     2. 方法扩展: 子类在父类方法的基础上增加功能
 
-【多继承和 MRO】
+[多继承和 MRO]
 
   Python 支持多继承: class C(A, B):
   但多继承容易出问题 (钻石继承). Python 用 MRO (Method Resolution Order)
@@ -41,7 +41,7 @@
   MRO 使用 C3 线性化算法.
   记住: 多继承要慎重, Mixin 模式是更好的选择.
 
-【运行方式】
+[运行方式]
   全部: python 02_inheritance.py
   单个: python 02_inheritance.py single / super / poly / mro / mixin / abc
 """
@@ -53,7 +53,7 @@ from abc import ABC, abstractmethod
 # ============================================================
 # 1. 单继承基础
 # ============================================================
-# Animal/Dog/Cat 在第 1、2、3 节都被用到, 所以放在模块顶层
+# Animal/Dog/Cat 在第 1, 2, 3 节都被用到, 所以放在模块顶层
 class Animal:
     def __init__(self, name):
         self.name = name
@@ -87,7 +87,7 @@ def demo_single():
 # ============================================================
 # 2. super() 调用父类
 # ============================================================
-# Bird 在第 2、3 节都被用到, 所以放在模块顶层
+# Bird 在第 2, 3 节都被用到, 所以放在模块顶层
 class Bird(Animal):
     def __init__(self, name, can_fly=True):
         super().__init__(name)           # 调用父类的 __init__
@@ -122,11 +122,11 @@ def demo_poly():
     animals = [Dog("大黄"), Cat("小花"), Bird("小蓝")]
     for a in animals:
         print(f"  {make_speak(a)}")
-    # 同一个 make_speak() 函数, 对不同的对象产生不同的行为 —— 这就是多态
+    # 同一个 make_speak() 函数, 对不同的对象产生不同的行为 -- 这就是多态
 
 
 # ============================================================
-# 4. MRO (Method Resolution Order) —— 方法解析顺序
+# 4. MRO (Method Resolution Order) -- 方法解析顺序
 # ============================================================
 def demo_mro():
     # MRO 回答一个问题: 当类有多个父类, 且父类有同名方法时, 先找谁?
@@ -187,16 +187,16 @@ def demo_mro():
 
 
 # ============================================================
-# 5. Mixin 模式 —— "给类加功能的小零件"
+# 5. Mixin 模式 -- "给类加功能的小零件"
 # ============================================================
 def demo_mixin():
     # Mixin 就是一个小型类, 它只提供一小块功能, 不单独使用.
     # 你要什么功能, 就"混入"什么 Mixin, 像给手机插扩展卡一样.
     #
     # 核心原则:
-    #   1. Mixin 不单独实例化 —— 它只是零件, 不是完整产品
-    #   2. Mixin 只做一件事 —— 一个 Mixin 只提供一种功能 (单一职责)
-    #   3. Mixin 写在父类列表的第一位 —— class MyClass(Mixin, BaseClass):
+    #   1. Mixin 不单独实例化 -- 它只是零件, 不是完整产品
+    #   2. Mixin 只做一件事 -- 一个 Mixin 只提供一种功能 (单一职责)
+    #   3. Mixin 写在父类列表的第一位 -- class MyClass(Mixin, BaseClass):
     #      这样 MRO 里 Mixin 的方法优先于 BaseClass 的同名方法
 
     print("\n--- Mixin 模式 ---")

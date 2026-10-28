@@ -1,7 +1,7 @@
 """
-文件读写 —— 数据持久化的基础
+文件读写 -- 数据持久化的基础
 
-【核心原则: 用 with 语句】
+[核心原则: 用 with 语句]
 
   with open("file.txt", "r") as f:
       content = f.read()
@@ -10,7 +10,7 @@
   永远用 with, 不要手动 f.close().
   这是上下文管理器的核心应用 (详见 03_advanced/12_context_manager.py).
 
-【文件模式速查】
+[文件模式速查]
 
   ┌──────┬────────────────────────────────────────────────────┐
   │ 模式  │ 含义                                                │
@@ -23,20 +23,20 @@
   │ '+'  │ 读写模式 (与上面组合: 'r+', 'w+')                       │
   └──────┴────────────────────────────────────────────────────┘
 
-【encoding 参数 —— 一定要指定!】
+[encoding 参数 -- 一定要指定!]
 
   open("file.txt", "r", encoding="utf-8")
   不指定 encoding 的话, Windows 默认用 GBK, Linux/Mac 用 UTF-8,
   会导致跨平台时乱码问题.
 
-【读取方式的选择】
+[读取方式的选择]
 
   f.read():       一次性读入整个文件 → 小文件
   f.readline():   读一行 → 需要逐行处理
   f.readlines():  读所有行, 返回 list → 小心大文件内存爆炸
   for line in f:  逐行迭代 → 大文件最佳实践 (内存友好)
 
-【运行方式】
+[运行方式]
   全部: python 08_file_io.py
   单个: python 08_file_io.py write / read / append / json / tools / cleanup
 """

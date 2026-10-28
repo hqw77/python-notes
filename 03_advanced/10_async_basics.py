@@ -1,7 +1,7 @@
 """
-异步编程基础 —— async / await / asyncio
+异步编程基础 -- async / await / asyncio
 
-【问题场景: 为什么需要异步?】
+[问题场景: 为什么需要异步?]
 
   同步代码的问题 ── 等待 I/O 时整个程序卡住:
     def fetch(url):
@@ -20,7 +20,7 @@
     # 请求 10 个 URL, 并发执行
     await asyncio.gather(*[fetch(url) for url in urls])  # 总共约 1 秒
 
-【核心概念】
+[核心概念]
 
   ┌──────────────┬────────────────────────────────────────────┐
   │ 概念          │ 解释                                        │
@@ -41,7 +41,7 @@
   │              │ 是程序进入异步世界的入口                      │
   └──────────────┴────────────────────────────────────────────┘
 
-【异步 != 多线程 —— 最重要的一句话】
+[异步 != 多线程 -- 最重要的一句话]
 
   异步是单线程内切换任务, 不是并行执行.
   适合:  I/O 密集型 (网络请求, 数据库查询, 文件读写) ── 等待时切换
@@ -51,7 +51,7 @@
     多线程 = 多个收银台同时工作 (并行)
     异步   = 一个收银员, 但趁顾客掏钱包时给另一个人结账 (并发)
 
-【async/await 的特殊方法 —— 异步版本的魔术方法】
+[async/await 的特殊方法 -- 异步版本的魔术方法]
 
   同步版本            异步版本              用途
   ────────────────── ──────────────────── ──────────
@@ -65,7 +65,7 @@
     async with async_context() as res:  # 代替 with
         ...
 
-【几个关键约束】
+[几个关键约束]
 
   1. await 只能用在 async def 函数内部
   2. 不能在普通函数里调用 await
@@ -73,7 +73,7 @@
      (实际项目如 FastAPI 中, 框架帮你管理事件循环, 你只需写 async def)
   4. await 后面的对象必须是 "awaitable": 协程, Task, 或实现了 __await__ 的对象
 
-【常见误区】
+[常见误区]
 
   误区 1: "async 函数一定比同步快"
     真相: 对单个任务, async 反而慢 (调度有开销). 优势体现在大量并发 I/O 时.
@@ -84,7 +84,7 @@
   误区 3: "asyncio.sleep() 和 time.sleep() 一样"
     真相: time.sleep() 阻塞整个线程; asyncio.sleep() 只挂起当前协程, 其他协程继续跑.
 
-【运行方式】
+[运行方式]
   全部: python 10_async_basics.py
   单个: python 10_async_basics.py sync_vs_async / basics / async_iter / async_with / concurrent_download / producer_consumer / error_handling / run_principle
 """
@@ -93,19 +93,19 @@ import asyncio
 import time
 
 # ============================================================
-# 1. 同步 vs 异步 —— 直观对比
+# 1. 同步 vs 异步 -- 直观对比
 # ============================================================
 def demo_sync_vs_async():
-    # 同步版本：一个个等，总时间 = 每个任务时间之和
+    # 同步版本: 一个个等, 总时间 = 每个任务时间之和
     def sync_task(name, delay):
-        """同步任务：阻塞等待"""
+        """同步任务: 阻塞等待"""
         print(f"  [{name}] 开始")
         time.sleep(delay)                    # 阻塞整个线程
         print(f"  [{name}] 完成 ({delay}s)")
         return f"{name} 结果"
 
     def run_sync():
-        print("同步执行：")
+        print("同步执行: ")
         start = time.perf_counter()
         sync_task("A", 1)
         sync_task("B", 1)
@@ -114,16 +114,16 @@ def demo_sync_vs_async():
 
     run_sync()
 
-    # 异步版本：等待时切换，总时间 ≈ 最长的那个任务时间
+    # 异步版本: 等待时切换, 总时间 ≈ 最长的那个任务时间
     async def async_task(name, delay):
-        """异步任务：等待时不阻塞"""
+        """异步任务: 等待时不阻塞"""
         print(f"  [{name}] 开始")
-        await asyncio.sleep(delay)           # 交出控制权，不阻塞
+        await asyncio.sleep(delay)           # 交出控制权, 不阻塞
         print(f"  [{name}] 完成 ({delay}s)")
         return f"{name} 结果"
 
     async def run_async():
-        print("\n异步执行：")
+        print("\n异步执行: ")
         start = time.perf_counter()
         # asyncio.gather: 并发执行多个协程
         results = await asyncio.gather(
@@ -146,11 +146,11 @@ def demo_basics():
         await asyncio.sleep(0.1)         # 模拟 I/O 等待
         return f"Hello, {name}"
 
-    # await → 等待另一个协程，交出控制权给事件循环
+    # await → 等待另一个协程, 交出控制权给事件循环
     async def main():
         print("\n--- async/await 基础 ---")
 
-        # 方式一: 直接 await（顺序执行）
+        # 方式一: 直接 await (顺序执行)
         r1 = await greet("Alice")
         r2 = await greet("Bob")
         print(f"  顺序: {r1}, {r2}")
@@ -173,11 +173,11 @@ def demo_basics():
 
 
 # ============================================================
-# 3. 异步迭代器 —— __aiter__ / __anext__
+# 3. 异步迭代器 -- __aiter__ / __anext__
 # ============================================================
 def demo_async_iter():
     class AsyncCounter:
-        """异步迭代器：每次迭代之间可以 await"""
+        """异步迭代器: 每次迭代之间可以 await"""
         def __init__(self, start, end):
             self.start = start
             self.end = end
@@ -204,7 +204,7 @@ def demo_async_iter():
 
 
 # ============================================================
-# 4. 异步上下文管理器 —— __aenter__ / __aexit__
+# 4. 异步上下文管理器 -- __aenter__ / __aexit__
 # ============================================================
 def demo_async_with():
     class AsyncResource:
@@ -228,7 +228,7 @@ def demo_async_with():
 
 
 # ============================================================
-# 5. 实用案例：并发下载多个 URL
+# 5. 实用案例: 并发下载多个 URL
 # ============================================================
 def demo_concurrent_download():
     # 模拟网络请求
@@ -259,14 +259,14 @@ def demo_concurrent_download():
 # ============================================================
 def demo_producer_consumer():
     async def producer(queue):
-        """生产者：往队列里放数据"""
+        """生产者: 往队列里放数据"""
         for i in range(5):
             await asyncio.sleep(0.2)      # 生产需要时间
             await queue.put(f"物品{i}")
             print(f"  生产: 物品{i}")
 
     async def consumer(queue):
-        """消费者：从队列里取数据"""
+        """消费者: 从队列里取数据"""
         for _ in range(5):
             item = await queue.get()
             await asyncio.sleep(0.3)      # 消费需要时间
@@ -323,14 +323,14 @@ def demo_error_handling():
 # ============================================================
 def demo_run_principle():
     """
-    asyncio.run(coro) 做的事情：
+    asyncio.run(coro) 做的事情:
       1. 创建一个事件循环 (Event Loop)
       2. 把协程包装成 Task
       3. 运行事件循环直到协程完成
       4. 关闭事件循环
 
-    每个线程只能有一个事件循环在运行。
-    asyncio.run() 是一个方便的入口，实际项目（如 FastAPI）中框架帮你管理循环。
+    每个线程只能有一个事件循环在运行.
+    asyncio.run() 是一个方便的入口, 实际项目 (如 FastAPI)中框架帮你管理循环.
     """
 
 
@@ -364,7 +364,7 @@ if __name__ == "__main__":
 # 总结
 # ============================================================
 # async def        → 定义协程
-# await            → 等待协程，交出控制权
+# await            → 等待协程, 交出控制权
 # asyncio.run()    → 运行协程的入口
 # asyncio.gather() → 并发执行多个协程
 # asyncio.create_task() → 把协程包装成 Task 放入事件循环
@@ -374,7 +374,7 @@ if __name__ == "__main__":
 #   __aenter__ / __aexit__          → async with
 #
 # 关键认知:
-#   - 异步 ≠ 并行多线程，单线程 I/O 复用
-#   - 适合: 网络请求、数据库查询、文件读写（大量 I/O 等待）
-#   - 不适合: CPU 密集计算（用多进程替代）
+#   - 异步 ≠ 并行多线程, 单线程 I/O 复用
+#   - 适合: 网络请求, 数据库查询, 文件读写 (大量 I/O 等待)
+#   - 不适合: CPU 密集计算 (用多进程替代)
 #   - await 只能用在 async def 函数内部

@@ -1,9 +1,9 @@
 """
-pathlib 模块 —— 面向对象的路径操作
+pathlib 模块 -- 面向对象的路径操作
 
-【问题场景: os.path 的字符串拼来拼去，又长又容易错】
+[问题场景: os.path 的字符串拼来拼去, 又长又容易错]
 
-  旧写法（字符串拼接，函数层层嵌套）：
+  旧写法 (字符串拼接, 函数层层嵌套):
       import os, os.path
       base = os.path.dirname(os.path.abspath(__file__))
       path = os.path.join(base, "data", "user.json")
@@ -12,30 +12,30 @@ pathlib 模块 —— 面向对象的路径操作
           with open(path, encoding="utf-8") as f:
               text = f.read()
 
-  新写法（路径是对象，属性直接取）：
+  新写法 (路径是对象, 属性直接取):
       from pathlib import Path
       path = Path(__file__).parent / "data" / "user.json"
       if path.is_file():
           stem = path.stem
           text = path.read_text(encoding="utf-8")
 
-  这也是为什么新代码几乎都用 pathlib：可读性差距是数量级的。
+  这也是为什么新代码几乎都用 pathlib: 可读性差距是数量级的.
 
-【核心概念】
+[核心概念]
 
   ┌────────────────────────────┬──────────────────────────────────────┐
-  │ Path("a") / "b" / "c.txt"  │ 用 / 拼接（比 os.path.join 短）      │
+  │ Path("a") / "b" / "c.txt"  │ 用 / 拼接 (比 os.path.join 短)      │
   │ .name .stem .suffix        │ 文件名 / 去掉后缀的名字 / 后缀       │
   │ .parent .parents .parts    │ 上级 / 所有上级 / 拆成元组           │
   │ .exists() .is_file() ...   │ 判断类型                             │
   │ .glob("*.py") .rglob()     │ 按模式找 / 递归找                    │
   │ .read_text() .write_text() │ 一行读写文本                         │
-  │ .mkdir(parents=True)       │ 建目录，自动创建中间层               │
+  │ .mkdir(parents=True)       │ 建目录, 自动创建中间层               │
   └────────────────────────────┴──────────────────────────────────────┘
 
-  注意：Path 只处理路径，不负责"文件内容格式"；读出来还是字符串/字节。
+  注意: Path 只处理路径, 不负责"文件内容格式"; 读出来还是字符串/字节.
 
-【运行方式】
+[运行方式]
   全部: python 03_pathlib.py
   单个: python 03_pathlib.py create / parts / query / read_write / manipulate / compare / use_cases
 """
@@ -66,7 +66,7 @@ def demo_create():
 
 
 # ============================================================
-# 2. 拆路径：name / stem / suffix / parent / parts
+# 2. 拆路径: name / stem / suffix / parent / parts
 # ============================================================
 def demo_parts():
     print("--- 2. 拆路径 ---")
@@ -88,7 +88,7 @@ def demo_parts():
 
 
 # ============================================================
-# 3. 查询：存在性、类型、遍历
+# 3. 查询: 存在性, 类型, 遍历
 # ============================================================
 def demo_query():
     print("--- 3. 查询与遍历目录 ---")
@@ -131,7 +131,7 @@ def demo_read_write():
         text = f.read_text(encoding="utf-8")
         print(f"  read_text: {text!r}")
 
-        # 追加（write_text 会覆盖，追加要用 open）
+        # 追加 (write_text 会覆盖, 追加要用 open)
         with f.open("a", encoding="utf-8") as fh:
             fh.write("第三行\n")
         print(f"  追加后行数: {len(f.read_text(encoding='utf-8').splitlines())}")
@@ -145,18 +145,18 @@ def demo_read_write():
         b.write_bytes(b"\x00\x01\x02")
         print(f"  write_bytes / read_bytes: {b.read_bytes()!r}")
 
-    print("  提示: 一定要写 encoding='utf-8'，Windows 默认编码是 gbk")
+    print("  提示: 一定要写 encoding='utf-8', Windows 默认编码是 gbk")
 
 
 # ============================================================
-# 5. 增删改：目录与文件
+# 5. 增删改: 目录与文件
 # ============================================================
 def demo_manipulate():
-    print("--- 5. 建目录、改名、删除 ---")
+    print("--- 5. 建目录, 改名, 删除 ---")
 
     with tempfile.TemporaryDirectory() as tmp:
         base = Path(tmp) / "a" / "b" / "c"
-        base.mkdir(parents=True, exist_ok=True)   # 自动创建中间层，已存在不报错
+        base.mkdir(parents=True, exist_ok=True)   # 自动创建中间层, 已存在不报错
         print(f"  建出多层目录: {base.relative_to(tmp)}")
 
         f = base / "x.txt"
@@ -202,11 +202,11 @@ def demo_compare():
     for op, old, new in rows:
         print(f"  {op:<8}{old:<42}{new}")
 
-    print("  os.path 依然在用的场景: 需要把路径当纯字符串处理、或兼容很老的代码")
+    print("  os.path 依然在用的场景: 需要把路径当纯字符串处理, 或兼容很老的代码")
 
 
 # ============================================================
-# 7. 实战：扫描目录，统计扩展名与最大的文件
+# 7. 实战: 扫描目录, 统计扩展名与最大的文件
 # ============================================================
 def demo_use_cases():
     print("--- 7. 实战: 扫描目录 ---")
@@ -233,11 +233,11 @@ def demo_use_cases():
         for p in largest:
             print(f"  {p.relative_to(root)!s:<20} {p.stat().st_size:>5} 字节")
 
-        # 总大小（人类可读）
+        # 总大小 (人类可读)
         total = sum(p.stat().st_size for p in files)
         print(f"  目录总大小: {total / 1024:.1f} KB")
 
-    print("  这就是 find + du 的 Python 版，写脚本时非常常用")
+    print("  这就是 find + du 的 Python 版, 写脚本时非常常用")
 
 
 # ============================================================
@@ -275,10 +275,10 @@ if __name__ == "__main__":
 #   遍历        .iterdir() / .glob("*.py") / .rglob("*.py")
 #   读写        .read_text(encoding="utf-8") / .write_text(s)
 #   建删        .mkdir(parents=True, exist_ok=True) / .unlink() / .rmdir()
-#   改名        .rename()（返回新路径） / .replace()
+#   改名        .rename() (返回新路径) / .replace()
 #   绝对化      .resolve()
 #
 # 三个坑:
-#   1. 读写文本一定要显式 encoding="utf-8"，Windows 默认是 gbk
-#   2. rmdir() 只能删空目录，要递归删用 shutil.rmtree()
-#   3. glob 匹配的是路径模式不是正则，"**" 递归、"[abc]" 字符集
+#   1. 读写文本一定要显式 encoding="utf-8", Windows 默认是 gbk
+#   2. rmdir() 只能删空目录, 要递归删用 shutil.rmtree()
+#   3. glob 匹配的是路径模式不是正则, "**" 递归, "[abc]" 字符集

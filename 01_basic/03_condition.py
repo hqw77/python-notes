@@ -1,7 +1,7 @@
 """
-条件判断 —— 让代码做出选择
+条件判断 -- 让代码做出选择
 
-【基本语法】
+[基本语法]
 
   if 条件:
       代码块
@@ -12,7 +12,7 @@
 
   Python 用缩进定义代码块 (不用花括号), 缩进必须是 4 个空格 (PEP 8 规范).
 
-【真值判断 (Truthy / Falsy) —— Python 特有的设计】
+[真值判断 (Truthy / Falsy) -- Python 特有的设计]
 
   在 if 语句中, Python 不要求条件必须是 bool, 任何对象都可以当条件.
 
@@ -27,7 +27,7 @@
 
   这意味着你不需要写 if len(lst) > 0:, 直接写 if lst: 就够了.
 
-【短路求值 —— and/or 的惰性计算】
+[短路求值 -- and/or 的惰性计算]
 
   and: 如果左边为 False, 右边不执行 (因为整体一定为 False)
   or:  如果左边为 True, 右边不执行 (因为整体一定为 True)
@@ -39,7 +39,7 @@
     0 or "hello"  → "hello"  (0 是 Falsy, 返回右边)
     100 and 200   → 200      (100 是 Truthy, 返回右边)
 
-【match/case —— Python 3.10+ 的模式匹配】
+[match/case -- Python 3.10+ 的模式匹配]
 
   比 if/elif/else 更强大的分支工具, 可以:
     - 匹配值
@@ -47,7 +47,7 @@
     - 解构序列/映射
     - 带守卫条件 (if 子句)
 
-【运行方式】
+[运行方式]
   全部: python 03_condition.py
   单个: python 03_condition.py if_else / comparison / membership / truthy / ternary / short_circuit / match / all_any
 """

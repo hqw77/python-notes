@@ -1,7 +1,7 @@
 """
-线程基础 —— threading 模块
+线程基础 -- threading 模块
 
-【运行方式】
+[运行方式]
   全部: python 02_threading.py
   单个: python 02_threading.py create / join / daemon / shared
 """
@@ -47,7 +47,7 @@ def demo_create():
 
 
 # ============================================================
-# 案例 2: join() 的作用 —— 等 vs 不等
+# 案例 2: join() 的作用 -- 等 vs 不等
 # ============================================================
 def demo_join():
     def slow_task(name):
@@ -102,7 +102,7 @@ def demo_shared():
     for t in threads:
         t.join()
     print(f"  期望: 400000, 实际: {counter}")
-    print("  (这里可能'碰巧'正确 —— GIL 每 5ms 才切换, 窗口太小难复现)")
+    print("  (这里可能'碰巧'正确 -- GIL 每 5ms 才切换, 窗口太小难复现)")
     print("  (真正的竞态要用'检查+扣款'这类有耗时窗口的操作, 见 03 章)")
 
 

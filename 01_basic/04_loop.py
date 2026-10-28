@@ -1,14 +1,14 @@
 """
-循环 —— for / while / break / continue
+循环 -- for / while / break / continue
 
-【两种循环, 两种场景】
+[两种循环, 两种场景]
 
   for:   知道要遍历什么 (一个序列, 一个范围), "对一个集合里的每个元素做..."
   while: 知道什么时候停 (一个条件), "当条件满足时一直做..."
 
   能用 for 就不用 while -- for 更安全 (不会死循环), 更可读.
 
-【for 循环的本质】
+[for 循环的本质]
 
   for x in obj: 的底层:
     1. 调用 iter(obj) 获取迭代器
@@ -18,7 +18,7 @@
   所以 for 循环不限于 list/str, 任何可迭代对象都能 for.
   (详见 03_advanced/11_iterator.py)
 
-【range -- 不是 list!】
+[range -- 不是 list!]
 
   range(5) 不返回 [0, 1, 2, 3, 4], 它返回一个 range 对象.
   range 是惰性的: 只在需要时产生下一个数字, 占用固定内存.
@@ -31,7 +31,7 @@
 
   如果你想得到一个 list: list(range(5)) → [0, 1, 2, 3, 4]
 
-【for-else: Python 独有但少为人知的语法】
+[for-else: Python 独有但少为人知的语法]
 
   for 循环正常结束 (没被 break) 时, 执行 else 块.
   如果被 break 中断了, 不执行 else.
@@ -44,7 +44,7 @@
     else:
         print("没找到")
 
-【运行方式】
+[运行方式]
   全部: python 04_loop.py
   单个: python 04_loop.py for / range / while / break_continue / for_else / enumerate_zip_reversed / nested
 """

@@ -1,7 +1,7 @@
 """
-协程基础 —— async/await 入门
+协程基础 -- async/await 入门
 
-【运行方式】
+[运行方式]
   全部: python 09_async_basics.py
   单个: python 09_async_basics.py basic / gather / concurrency / exception / sleep / async_for
 """
@@ -11,7 +11,7 @@ import time
 
 
 # ============================================================
-# 案例 1: 最基本的协程 —— async def + await + asyncio.run
+# 案例 1: 最基本的协程 -- async def + await + asyncio.run
 # ============================================================
 def demo_basic():
     async def greet(name):
@@ -29,7 +29,7 @@ def demo_basic():
 
 
 # ============================================================
-# 案例 2: gather —— 并发运行多个协程 (保序返回)
+# 案例 2: gather -- 并发运行多个协程 (保序返回)
 # ============================================================
 def demo_gather():
     async def fetch(name, delay):
@@ -51,7 +51,7 @@ def demo_gather():
 
 
 # ============================================================
-# 案例 3: 三种并发执行方式 —— 直接 await / create_task / gather
+# 案例 3: 三种并发执行方式 -- 直接 await / create_task / gather
 # ============================================================
 def demo_concurrency():
     async def greet(name):
@@ -61,13 +61,13 @@ def demo_concurrency():
         return f"Hello, {name}"
 
     async def main():
-        print("--- 方式一：直接 await（顺序执行）---")
+        print("--- 方式一: 直接 await (顺序执行)---")
         start = time.perf_counter()
         await greet("Alice")
         await greet("Bob")
         print(f"  耗时: {time.perf_counter() - start:.2f}s\n")
 
-        print("--- 方式二：create_task（并发执行，可逐个控制）---")
+        print("--- 方式二: create_task (并发执行, 可逐个控制)---")
         start = time.perf_counter()
         task1 = asyncio.create_task(greet("Charlie"))
         task2 = asyncio.create_task(greet("Dave"))
@@ -76,7 +76,7 @@ def demo_concurrency():
         print(f"  结果: {r3}, {r4}")
         print(f"  耗时: {time.perf_counter() - start:.2f}s\n")
 
-        print("--- 方式三：gather（批量并发，保序返回）---")
+        print("--- 方式三: gather (批量并发, 保序返回)---")
         start = time.perf_counter()
         results = await asyncio.gather(
             greet("Eve"),
@@ -89,7 +89,7 @@ def demo_concurrency():
 
 
 # ============================================================
-# 案例 4: 异常处理 —— 默认抛出 vs return_exceptions=True
+# 案例 4: 异常处理 -- 默认抛出 vs return_exceptions=True
 # ============================================================
 def demo_exception():
     async def risky_task(name, should_fail):
@@ -125,7 +125,7 @@ def demo_exception():
 
 
 # ============================================================
-# 案例 5: 阻塞 vs 非阻塞 —— time.sleep vs asyncio.sleep
+# 案例 5: 阻塞 vs 非阻塞 -- time.sleep vs asyncio.sleep
 # ============================================================
 def demo_sleep():
     async def blocking_demo():

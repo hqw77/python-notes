@@ -1,7 +1,7 @@
 """
-进程 —— multiprocessing, 绕过 GIL 做真并行
+进程 -- multiprocessing, 绕过 GIL 做真并行
 
-【运行方式】
+[运行方式]
   全部: python 06_multiprocessing.py
   单个: python 06_multiprocessing.py parallel / shared / return
 """

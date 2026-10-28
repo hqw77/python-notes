@@ -1,7 +1,7 @@
 """
-线程池 —— concurrent.futures.ThreadPoolExecutor
+线程池 -- concurrent.futures.ThreadPoolExecutor
 
-【运行方式】
+[运行方式]
   全部: python 05_thread_pool.py
   单个: python 05_thread_pool.py submit / map / completed / download / error
 """
@@ -11,7 +11,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 # ============================================================
-# 案例 1: 基础用法 —— submit + result
+# 案例 1: 基础用法 -- submit + result
 # ============================================================
 def demo_submit():
     def fetch(url):
@@ -28,7 +28,7 @@ def demo_submit():
 
 
 # ============================================================
-# 案例 2: map —— 批量提交, 结果保序
+# 案例 2: map -- 批量提交, 结果保序
 # ============================================================
 def demo_map():
     def fetch(url):
@@ -46,7 +46,7 @@ def demo_map():
 
 
 # ============================================================
-# 案例 3: as_completed —— 谁先完成先处理谁
+# 案例 3: as_completed -- 谁先完成先处理谁
 # ============================================================
 def demo_completed():
     def fetch(url):
@@ -63,7 +63,7 @@ def demo_completed():
 
 
 # ============================================================
-# 案例 4: 实战 —— 并发下载 (I/O 密集)
+# 案例 4: 实战 -- 并发下载 (I/O 密集)
 # ============================================================
 def demo_download():
     def download(page):
@@ -81,7 +81,7 @@ def demo_download():
 
 
 # ============================================================
-# 案例 5: 异常处理 —— 任务出错怎么办
+# 案例 5: 异常处理 -- 任务出错怎么办
 # ============================================================
 def demo_error():
     def risky(n):

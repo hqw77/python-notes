@@ -1,9 +1,9 @@
 """
-属性访问控制 —— __getattr__ / __setattr__ / __getattribute__ / __delattr__
+属性访问控制 -- __getattr__ / __setattr__ / __getattribute__ / __delattr__
 
 这四个方法可以拦截对象属性的读取, 设置, 删除.
 
-【四个方法的触发时机】
+[四个方法的触发时机]
 
   ┌───────────────────┬──────────────────────┬───────────────────────┐
   │ 方法               │ 触发时机              │ 危险性                 │
@@ -19,7 +19,7 @@
   │ __delattr__       │ 每次删除属性时调用     │ 相对安全               │
   └───────────────────┴──────────────────────┴───────────────────────┘
 
-【最重要的防递归技巧】
+[最重要的防递归技巧]
 
   在 __setattr__, __getattribute__, __delattr__ 内部, 绝对不要直接写:
     self.xxx = yyy       # 会再次触发 __setattr__ → 无限递归!
@@ -36,7 +36,7 @@
   为什么 object.__setattr__ 能绕过? 因为 object (C 语言实现) 直接操作
   C 层的属性字典, 不会触发 Python 层的魔术方法.
 
-【完整的属性查找链 —— obj.attr 时发生了什么?】
+[完整的属性查找链 -- obj.attr 时发生了什么?]
 
   obj.attr 的查找顺序 (类内部用 C3 线性化遍历所有父类):
     1. __getattribute__(obj, "attr") 无条件触发
@@ -49,7 +49,7 @@
 
   这也是为什么 __getattr__ 被称为"兜底" ── 它只在最后被调用.
 
-【典型应用场景】
+[典型应用场景]
 
   __getattr__:
     - 代理模式: 把不存在的方法调用转发给内部对象
@@ -69,17 +69,17 @@
     - 极少数场景, 如 ORM 的懒加载, 属性访问审计
     - 90% 的情况应该用 __getattr__ 代替
 
-【运行方式】
+[运行方式]
   全部: python 08_attribute_access.py
   单个: python 08_attribute_access.py getattr / proxy / setattr / delattr / getattribute / order
 """
 
 # ============================================================
-# 1. __getattr__ —— 属性不存在时才触发
+# 1. __getattr__ -- 属性不存在时才触发
 # ============================================================
 def demo_getattr():
     class DynamicAttributes:
-        """对不存在的属性返回默认值，而不是抛 AttributeError"""
+        """对不存在的属性返回默认值, 而不是抛 AttributeError"""
         def __init__(self):
             self.existing = "我有这个属性"
 
@@ -90,13 +90,13 @@ def demo_getattr():
 
     obj = DynamicAttributes()
     print("--- __getattr__: 属性不存在时触发 ---")
-    print(f"  obj.existing = {obj.existing}")    # 正常访问，不触发 __getattr__
-    print(f"  obj.missing = {obj.missing}")      # 属性不存在，触发 __getattr__
+    print(f"  obj.existing = {obj.existing}")    # 正常访问, 不触发 __getattr__
+    print(f"  obj.missing = {obj.missing}")      # 属性不存在, 触发 __getattr__
     print(f"  obj.anything = {obj.anything}")     # 同样触发
 
 
 # ============================================================
-# 2. __getattr__ 实用案例：代理 / 包装器
+# 2. __getattr__ 实用案例: 代理 / 包装器
 # ============================================================
 def demo_proxy():
     class Proxy:
@@ -112,18 +112,18 @@ def demo_proxy():
     print("\n--- __getattr__: 代理模式 ---")
     plist = Proxy([1, 2, 3])
     print(f"  plist.append(4): {plist.append(4)}")
-    print(f"  plist.__class__: {plist.__class__}")     # 不会拦截 __class__，因为实际存在
+    print(f"  plist.__class__: {plist.__class__}")     # 不会拦截 __class__, 因为实际存在
     print(f"  plist._target: {plist._target}")          # 不会拦截 _target
 
 
 # ============================================================
-# 3. __setattr__ —— 每次设置属性都触发
+# 3. __setattr__ -- 每次设置属性都触发
 # ============================================================
 def demo_setattr():
     class GuardedObject:
         """记录所有属性的设置操作"""
         def __init__(self, name):
-            # 这里必须用 object.__setattr__ 或 self.__dict__，否则无限递归！
+            # 这里必须用 object.__setattr__ 或 self.__dict__, 否则无限递归!
             object.__setattr__(self, "_log", [])
             self.name = name                   # 这会触发 __setattr__
 
@@ -131,7 +131,7 @@ def demo_setattr():
             """拦截所有 self.xxx = yyy 操作"""
             log = object.__getattribute__(self, "_log")   # 绕过 __getattribute__
             log.append(f"设置 {name} = {value!r}")
-            # 安全地设置属性 —— 用父类的 __setattr__
+            # 安全地设置属性 -- 用父类的 __setattr__
             object.__setattr__(self, name, value)
 
         def show_log(self):
@@ -146,7 +146,7 @@ def demo_setattr():
 
 
 # ============================================================
-# 4. __delattr__ —— 每次删除属性时触发
+# 4. __delattr__ -- 每次删除属性时触发
 # ============================================================
 def demo_delattr():
     class Protected:
@@ -172,17 +172,17 @@ def demo_delattr():
 
 
 # ============================================================
-# 5. __getattribute__ —— 危险！每次访问属性都触发
+# 5. __getattribute__ -- 危险! 每次访问属性都触发
 # ============================================================
 def demo_getattribute():
     class LogAccess:
-        """记录所有属性访问（包括存在的属性）"""
+        """记录所有属性访问 (包括存在的属性)"""
         def __init__(self):
             object.__setattr__(self, "_access_log", [])
 
         def __getattribute__(self, name):
-            """每次访问任何属性都会触发 —— 极易无限递归！"""
-            # 绝对不能写 self._access_log ！！！会无限递归！！！
+            """每次访问任何属性都会触发 -- 极易无限递归! """
+            # 绝对不能写 self._access_log ! ! ! 会无限递归! ! !
             log = object.__getattribute__(self, "_access_log")
             if not name.startswith("_"):
                 log.append(f"访问了 {name}")
@@ -208,16 +208,16 @@ def demo_order():
             self.existing = "已有的属性"   # 触发 __setattr__
 
         def __getattribute__(self, name):
-            print(f"    1. __getattribute__('{name}') — 每次都触发")
+            print(f"    1. __getattribute__('{name}') - 每次都触发")
             try:
                 return object.__getattribute__(self, name)
             except AttributeError:
                 pass
-            # 找不到时，继续往下走……
+            # 找不到时, 继续往下走...
             # Python 会自动调用 __getattr__
 
         def __getattr__(self, name):
-            print(f"    2. __getattr__('{name}') — 没找到才触发")
+            print(f"    2. __getattr__('{name}') - 没找到才触发")
             return f"默认值 for '{name}'"
 
         def __setattr__(self, name, value):
@@ -267,8 +267,8 @@ if __name__ == "__main__":
 # 总结
 # ============================================================
 # 触发时机:
-#   __getattribute__ : 每次访问属性（无论存在与否）— 慎用！
-#   __getattr__      : 正常查找失败后调用 — 安全，常用
+#   __getattribute__ : 每次访问属性 (无论存在与否)- 慎用!
+#   __getattr__      : 正常查找失败后调用 - 安全, 常用
 #   __setattr__      : 每次设置属性时调用
 #   __delattr__      : 每次删除属性时调用
 #
@@ -277,6 +277,6 @@ if __name__ == "__main__":
 #   用 self.__dict__[name] = value 也可以
 #
 # 使用场景:
-#   __getattr__ → 代理模式、动态属性、API 包装
-#   __setattr__ → 属性验证、访问日志、不可变对象
-#   __delattr__ → 属性保护、清理逻辑
+#   __getattr__ → 代理模式, 动态属性, API 包装
+#   __setattr__ → 属性验证, 访问日志, 不可变对象
+#   __delattr__ → 属性保护, 清理逻辑

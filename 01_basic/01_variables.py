@@ -1,15 +1,15 @@
 """
-变量与基本类型 —— Python 的数据基石
+变量与基本类型 -- Python 的数据基石
 
-【变量是什么?】
+[变量是什么?]
 
-  变量 = 贴在对象上的标签, 不是"装数据的盒子"。
-  Python 中一切皆对象, 变量只是指向对象的引用。
+  变量 = 贴在对象上的标签, 不是"装数据的盒子".
+  Python 中一切皆对象, 变量只是指向对象的引用.
 
   x = 10
-  不是把 10 "放进" x, 而是给内存中 int 对象 10 贴了个标签叫 x。
+  不是把 10 "放进" x, 而是给内存中 int 对象 10 贴了个标签叫 x.
 
-【Python 是动态类型语言】
+[Python 是动态类型语言]
 
   变量不需要声明类型, 运行时才知道类型:
     x = 10         # x 是 int
@@ -20,7 +20,7 @@
   优点: 代码简洁, 灵活
   缺点: 类型错误要到运行时才能发现 (这就是类型注解存在的意义, 见 05_tooling)
 
-【基本类型一览】
+[基本类型一览]
 
   ┌────────────┬──────────────┬───────────────────────┐
   │ 类型        │ 示例          │ 说明                   │
@@ -37,7 +37,7 @@
     False == 0  # True
     True + True # 2 (这就是为什么 True 可以当 1 用)
 
-【== vs is —— 最容易混淆的两个操作符】
+[== vs is -- 最容易混淆的两个操作符]
 
   == : 比较"值"是否相等 (调用 __eq__)
   is : 比较"身份"是否相同 (比较内存地址 id())
@@ -52,16 +52,16 @@
     a = 256; b = 256; a is b  # True  (指向同一个缓存对象)
     a = 257; b = 257; a is b  # False (超出范围, 各自创建新对象)
 
-  但不要依赖这个行为! 它只是 CPython 的实现细节, 其他 Python 实现未必如此。
+  但不要依赖这个行为! 它只是 CPython 的实现细节, 其他 Python 实现未必如此.
 
-【运行方式】
+[运行方式]
   全部: python 01_variables.py
   单个: python 01_variables.py label / type / convert / multi / is_ / naming
 """
 
 
 # ============================================================
-# 案例 1: 变量赋值 —— 标签, 不是盒子
+# 案例 1: 变量赋值 -- 标签, 不是盒子
 # ============================================================
 def demo_label():
     print("--- 变量是标签 ---")
@@ -91,7 +91,7 @@ def demo_type():
     print(f"  {a_bool=}, 类型: {type(a_bool).__name__}")
     print(f"  {a_none=}, 类型: {type(a_none).__name__}")
 
-    # isinstance() —— 安全判断类型 (支持继承)
+    # isinstance() -- 安全判断类型 (支持继承)
     print(f"\n  isinstance(42, int): {isinstance(42, int)}")
     print(f"  isinstance(True, int): {isinstance(True, int)}")   # True! bool 是 int 的子类
     print(f"  isinstance(True, bool): {isinstance(True, bool)}")
@@ -134,15 +134,15 @@ def demo_is():
     print("--- is vs == ---")
     a = [1, 2, 3]
     b = [1, 2, 3]
-    print(f"  a == b: {a == b}")     # True —— 内容相同
-    print(f"  a is b: {a is b}")     # False —— 不是同一个对象
+    print(f"  a == b: {a == b}")     # True -- 内容相同
+    print(f"  a is b: {a is b}")     # False -- 不是同一个对象
     print(f"  id(a) = {id(a)}")
     print(f"  id(b) = {id(b)}")
 
     # None 必须用 is
     x = None
-    print(f"\n  x is None: {x is None}")   # True —— 正确写法
-    print(f"  x == None: {x == None}")     # True —— 能工作但不推荐
+    print(f"\n  x is None: {x is None}")   # True -- 正确写法
+    print(f"  x == None: {x == None}")     # True -- 能工作但不推荐
 
     # 小整数缓存
     print("\n--- 小整数缓存 (-5 ~ 256) ---")

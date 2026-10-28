@@ -1,7 +1,7 @@
 """
-类与实例 —— 面向对象编程的基石
+类与实例 -- 面向对象编程的基石
 
-【什么是类? 什么是实例?】
+[什么是类? 什么是实例?]
 
   类就是"蓝图", 实例就是按蓝图造出来的"实物".
     class Dog:        ← 类 (蓝图): 狗有名字, 会叫
@@ -12,7 +12,7 @@
   类定义了一类对象共有的属性 (数据) 和方法 (行为).
   每个实例有自己独立的属性值 (你的狗叫旺财, 我的狗叫来福).
 
-【self 是什么?】
+[self 是什么?]
 
   self 代表"当前这个实例". 当你写 dog.bark() 时:
     1. Python 把 dog 作为第一个参数传入 bark
@@ -21,7 +21,7 @@
 
   从 C++/Java 转过来的话: self ≈ this, 但 Python 必须显式写出 self.
 
-【__init__ 不是构造函数!】
+[__init__ 不是构造函数!]
 
   __init__ 是"初始化方法", 不是真正的构造函数.
   真正的构造函数是 __new__, 它负责创建对象.
@@ -29,7 +29,7 @@
 
   __new__ 创建对象 → __init__ 初始化对象
 
-【实例属性 vs 类属性】
+[实例属性 vs 类属性]
 
   class Dog:
       species = "犬科"     # 类属性: 所有实例共享
@@ -39,7 +39,7 @@
 
   Dog.species 改了就全改了, dog.name 只改这一只狗.
 
-【属性查找顺序 (关键!)】
+[属性查找顺序 (关键!)]
 
   当你写 obj.attr 时, Python 按此顺序查找:
     1. 数据描述符 (__get__ + __set__)
@@ -50,7 +50,7 @@
 
   这就是为什么类属性可以被所有实例访问, 但实例属性会覆盖同名类属性.
 
-【运行方式】
+[运行方式]
   全部: python 01_class_basic.py
   单个: python 01_class_basic.py class / attr / private / slots / builtin
 """
@@ -59,7 +59,7 @@
 # ============================================================
 # 1. 类的定义与实例化
 # ============================================================
-# Dog 类在第 1、2 节都被用到, 所以放在模块顶层 (demo 函数之前)
+# Dog 类在第 1, 2 节都被用到, 所以放在模块顶层 (demo 函数之前)
 class Dog:
     """一个简单的狗类"""
     species = "犬科"          # 类属性
@@ -75,7 +75,7 @@ class Dog:
     def info(self):
         return f"{self.name}, {self.age}岁, {self.species}"
 
-# 创建实例 (dog1/dog2 在第 1、2 节都被用到, 也放在模块顶层)
+# 创建实例 (dog1/dog2 在第 1, 2 节都被用到, 也放在模块顶层)
 dog1 = Dog("旺财", 3)
 dog2 = Dog("来福", 1)
 
@@ -144,7 +144,7 @@ def demo_private():
 # ============================================================
 # 4. __slots__ 节省内存
 # ============================================================
-# NormalPerson 在第 4、5 节都被用到, 所以放在模块顶层
+# NormalPerson 在第 4, 5 节都被用到, 所以放在模块顶层
 class NormalPerson:
     def __init__(self, name, age):
         self.name = name
@@ -163,14 +163,14 @@ def demo_slots():
     np = NormalPerson("Alice", 30)
     sp = SlottedPerson("Bob", 25)
     print(f"  NormalPerson 有 __dict__: {hasattr(np, '__dict__')}")     # True
-    print(f"  SlottedPerson 有 __dict__: {hasattr(sp, '__dict__')}")   # False —— 省内存!
+    print(f"  SlottedPerson 有 __dict__: {hasattr(sp, '__dict__')}")   # False -- 省内存!
 
     # __slots__ 的代价: 不能动态添加属性
     # sp.email = "bob@test.com"  # AttributeError!
 
 
 # ============================================================
-# 5. 内置工具函数 —— 运行时动态操作对象
+# 5. 内置工具函数 -- 运行时动态操作对象
 # ============================================================
 def demo_builtin():
     print("\n--- 内置工具 ---")
@@ -183,7 +183,7 @@ def demo_builtin():
     # isinstance(obj, Class) → 检查 obj 是不是 Class 的实例 (支持继承!)
     # isinstance 比 type(obj) == Class 更好, 因为它会检查整条继承链
     print(f"  isinstance(p, NormalPerson) = {isinstance(p, NormalPerson)}")  # True
-    print(f"  isinstance(p, object) = {isinstance(p, object)}")     # True —— 一切皆是 object
+    print(f"  isinstance(p, object) = {isinstance(p, object)}")     # True -- 一切皆是 object
 
     # hasattr(obj, '属性名') → 检查对象有没有这个属性
     print(f"  hasattr(p, 'name'): {hasattr(p, 'name')}")     # True

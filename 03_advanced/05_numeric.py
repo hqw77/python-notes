@@ -1,7 +1,7 @@
 """
-数值运算符协议 —— 让对象支持 + - * / 等数学运算
+数值运算符协议 -- 让对象支持 + - * / 等数学运算
 
-【三种运算符，三个层次】
+[三种运算符, 三个层次]
 
   ┌──────────────┬─────────────────────────────┬───────────────────────┐
   │ 类别          │ 魔术方法                     │ 语法                  │
@@ -21,41 +21,41 @@
   │              │ __abs__ : abs(x)             │                       │
   └──────────────┴─────────────────────────────┴───────────────────────┘
 
-【调用链路 —— 3 * v 是怎么工作的？】
+[调用链路 -- 3 * v 是怎么工作的?]
 
-  当你写 3 * v 时（int 在左，Vector 在右）：
+  当你写 3 * v 时 (int 在左, Vector 在右):
     1. Python 调用 int.__mul__(3, v)
-    2. int 不认识 Vector，返回 NotImplemented
-    3. Python 不放弃，尝试 Vector.__rmul__(v, 3)
-    4. __rmul__ 返回结果 → 成功！
+    2. int 不认识 Vector, 返回 NotImplemented
+    3. Python 不放弃, 尝试 Vector.__rmul__(v, 3)
+    4. __rmul__ 返回结果 → 成功!
 
-  所以：__mul__ 处理 v * 3，__rmul__ 处理 3 * v。
-  如果两边类型都不认识对方，Python 才抛 TypeError。
+  所以: __mul__ 处理 v * 3, __rmul__ 处理 3 * v.
+  如果两边类型都不认识对方, Python 才抛 TypeError.
 
-  r 前缀的含义：r = "reflected"（反射），即操作数位置互换后的版本。
+  r 前缀的含义: r = "reflected" (反射), 即操作数位置互换后的版本.
 
-【__add__ vs __iadd__ 的区别】
+[__add__ vs __iadd__ 的区别]
 
-  __add__  (a + b)  : 返回新对象，不修改 a 和 b
-  __iadd__ (a += b) : 修改 a 自身，返回 a（必须返回 self）
+  __add__  (a + b): 返回新对象, 不修改 a 和 b
+  __iadd__ (a += b): 修改 a 自身, 返回 a (必须返回 self)
 
-  如果你没写 __iadd__ 但写了 __add__：
-    a += b  →  Python 降级为 a = a + b  → 调用 __add__，然后重新赋值
+  如果你没写 __iadd__ 但写了 __add__:
+    a += b  →  Python 降级为 a = a + b  → 调用 __add__, 然后重新赋值
 
-  什么时候必须用 __iadd__？
-    - 可变对象（list, dict）：+= 应该原地修改，否则和内置行为不一致
-    - 不可变对象（int, str, tuple）：__add__ 就够了，反正不能原地修改
+  什么时候必须用 __iadd__?
+    - 可变对象 (list, dict): += 应该原地修改, 否则和内置行为不一致
+    - 不可变对象 (int, str, tuple): __add__ 就够了, 反正不能原地修改
 
-  例：
+  例:
     lst = [1, 2]          num = 10
     lst += [3]             num += 5
-    等价于：               等价于：
+    等价于:               等价于:
     lst.__iadd__([3])      num = num.__add__(5)
-    原地修改 ↑             创建新 int ↑（int 是 immutable）
+    原地修改 ↑             创建新 int ↑ (int 是 immutable)
 
-【右运算符（__rXXX__）存在的意义】
+[右运算符 (__rXXX__)存在的意义]
 
-  不是所有类型都知道怎么和你的类运算：
+  不是所有类型都知道怎么和你的类运算:
 
     class Vector:
         def __mul__(self, scalar):   # Vector * 3 ✓
@@ -65,22 +65,22 @@
     3 * v  ✗  int.__mul__(3, v) → NotImplemented
              → Python 尝试 Vector.__rmul__(v, 3) → 能做
 
-  如果你希望你的类能和内置类型混合运算，__rXXX__ 几乎是必须的。
+  如果你希望你的类能和内置类型混合运算, __rXXX__ 几乎是必须的.
 
-【类型转换魔术方法（额外知识点）】
+[类型转换魔术方法 (额外知识点)]
 
   __int__(self)    → int(obj)
   __float__(self)  → float(obj)
-  __bool__(self)   → bool(obj)（用于 if obj: 判断真值）
+  __bool__(self)   → bool(obj) (用于 if obj: 判断真值)
   __complex__(self) → complex(obj)
 
-【运行方式】
+[运行方式]
   全部: python 05_numeric.py
   单个: python 05_numeric.py add / mul / iadd / unary / money / cheatsheet
 """
 
 # ============================================================
-# 1. 基础：实现向量加法
+# 1. 基础: 实现向量加法
 # ============================================================
 def demo_add():
     class Vector:
@@ -117,7 +117,7 @@ def demo_add():
 
 
 # ============================================================
-# 2. 标量乘法 —— 支持 Vector * 数字 和 数字 * Vector
+# 2. 标量乘法 -- 支持 Vector * 数字 和 数字 * Vector
 # ============================================================
 def demo_mul():
     class VectorV2:
@@ -132,11 +132,11 @@ def demo_mul():
             return NotImplemented
 
         def __rmul__(self, scalar):
-            """scalar * Vector —— 当左边 int 不知道怎么乘 Vector 时调用"""
+            """scalar * Vector -- 当左边 int 不知道怎么乘 Vector 时调用"""
             # Python 先尝试 int.__mul__(3, v) → 返回 NotImplemented
             # 然后尝试 VectorV2.__rmul__(v, 3) → 成功
             return self.__mul__(scalar)   # 直接复用 __mul__
-        # Python 的方法调用机制会自动将点号左边的实例作为第一个参数（即 self）传递给方法。
+        # Python 的方法调用机制会自动将点号左边的实例作为第一个参数 (即 self)传递给方法.
 
         def __truediv__(self, scalar):
             """Vector / scalar"""
@@ -187,14 +187,14 @@ def demo_iadd():
     c -= 3
     print(f"  c -= 3 → {c}")     # Counter(12)
 
-    # 关键区别：
-    #   __add__  返回新对象，原对象不变: c = c + 1
-    #   __iadd__ 修改自身，不创建新对象: c += 1
-    # 如果没定义 __iadd__，Python 会用 __add__ 代替：c = c.__add__(1)
+    # 关键区别:
+    #   __add__  返回新对象, 原对象不变: c = c + 1
+    #   __iadd__ 修改自身, 不创建新对象: c += 1
+    # 如果没定义 __iadd__, Python 会用 __add__ 代替: c = c.__add__(1)
 
 
 # ============================================================
-# 4. 一元运算符：-x, +x, abs(x)
+# 4. 一元运算符: -x, +x, abs(x)
 # ============================================================
 def demo_unary():
     class VectorV3:
@@ -207,7 +207,7 @@ def demo_unary():
             return VectorV3(-self.x, -self.y)
 
         def __abs__(self):
-            """abs(self) → 向量的模（长度）"""
+            """abs(self) → 向量的模 (长度)"""
             return (self.x ** 2 + self.y ** 2) ** 0.5
 
         def __repr__(self):
@@ -216,15 +216,15 @@ def demo_unary():
     v = VectorV3(3, 4)
     print(f"\n--- 一元运算符 ---")
     print(f"  -{v} = {-v}")
-    print(f"  abs({v}) = {abs(v)}")    # 5.0，勾股定理
+    print(f"  abs({v}) = {abs(v)}")    # 5.0, 勾股定理
 
 
 # ============================================================
-# 5. 实用案例：金额类 —— 避免浮点精度问题
+# 5. 实用案例: 金额类 -- 避免浮点精度问题
 # ============================================================
 def demo_money():
     class Money:
-        """用整数（分）存储金额，避免浮点误差"""
+        """用整数 (分)存储金额, 避免浮点误差"""
         def __init__(self, amount):
             self.cents = round(amount * 100)      # 转为分存储
 
@@ -272,7 +272,7 @@ def demo_money():
     print(f"  {a} - {b} = {a - b}")       # Money(7.25)
     print(f"  {a} * 3 = {a * 3}")         # Money(31.50)
     print(f"  -{a} = {-a}")               # Money(-10.50)
-    print(f"  {a} > {b}: {a > b}")        # True（用了 __lt__）
+    print(f"  {a} > {b}: {a > b}")        # True (用了 __lt__)
 
 
 # ============================================================
@@ -281,13 +281,13 @@ def demo_money():
 def demo_cheatsheet():
     """
     算术运算:
-      __add__(self, other)  : +            __radd__  : 右 +
-      __sub__(self, other)  : -            __rsub__  : 右 -
-      __mul__(self, other)  : *            __rmul__  : 右 *
+      __add__(self, other): +            __radd__  : 右 +
+      __sub__(self, other): -            __rsub__  : 右 -
+      __mul__(self, other): *            __rmul__  : 右 *
       __truediv__(self, other): /          __rtruediv__: 右 /
       __floordiv__(self, other): // 整除   __rfloordiv__: 右 //
-      __mod__(self, other)  : %            __rmod__  : 右 %
-      __pow__(self, other)  : **           __rpow__  : 右 **
+      __mod__(self, other): %            __rmod__  : 右 %
+      __pow__(self, other): **           __rpow__  : 右 **
 
     增强赋值:
       __iadd__  : +=    __isub__  : -=      __imul__  : *=
@@ -331,8 +331,8 @@ if __name__ == "__main__":
 # 总结
 # ============================================================
 # - __add__/__sub__/__mul__/__truediv__ 让对象支持运算
-# - __radd__/__rmul__ 等让对象能放在操作数右边（3 * obj）
-# - __iadd__/__isub__ 让 += 修改自身（不分配新对象）
+# - __radd__/__rmul__ 等让对象能放在操作数右边 (3 * obj)
+# - __iadd__/__isub__ 让 += 修改自身 (不分配新对象)
 # - __neg__/__abs__ 让 -obj 和 abs(obj) 工作
 # - 增强赋值必须返回 self
 # - NotImplemented 让 Python 尝试右运算符方法
