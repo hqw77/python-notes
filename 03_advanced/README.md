@@ -23,6 +23,7 @@
 03_advanced/
 ├── 11_iterator.py           → 迭代器协议（__iter__ / __next__）
 ├── 12_context_manager.py    → 上下文管理器（__enter__ / __exit__）
+├── 13_itertools.py          → itertools 迭代器工具集
 ├── 01_str_repr.py           → __str__ / __repr__
 ├── 02_container.py          → 容器协议
 ├── 03_callable.py           → __call__
@@ -36,7 +37,8 @@
 └── README.md                → 本文件
 ```
 
-> `11_iterator.py`、`12_context_manager.py` 编号排在最后，但内容是协议基础（for / with 的底层），建议最先读。
+> `11_iterator.py`～`13_itertools.py` 编号排在最后：11/12 是协议基础（for / with 的底层），建议最先读；
+> 13 是迭代器工具箱，读完 `09_generator_advanced.py` 再来看。
 
 ## 1. 迭代器协议 (`__iter__` / `__next__`)
 

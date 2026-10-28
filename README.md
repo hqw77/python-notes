@@ -71,7 +71,7 @@ pytest                            # 运行测试
 
 ## 第三阶段：进阶特性 `03_advanced/`
 
-十二个专题：两种协议（迭代器、上下文管理器）+ 十个魔术方法与语法特性，每个都有完整案例。配套 [README.md](03_advanced/README.md)（487 行，接近一本速查手册）。
+十三个专题：两种协议（迭代器、上下文管理器）+ itertools 工具集 + 十个魔术方法与语法特性，每个都有完整案例。配套 [README.md](03_advanced/README.md)（487 行，接近一本速查手册）。
 
 | # | 文件 | 内容 | 状态 |
 |---|---|---|---|
@@ -87,18 +87,21 @@ pytest                            # 运行测试
 | 10 | 10_async_basics.py | async / await / asyncio | ✅ |
 | 11 | 11_iterator.py | 迭代器协议（__iter__ / __next__）、生成器、内置迭代器 | ✅ |
 | 12 | 12_context_manager.py | 上下文管理器（__enter__ / __exit__）、contextlib、嵌套与异常控制 | ✅ |
+| 13 | 13_itertools.py | itertools：无限 / 终止 / 组合 / 分组 / 切片 / pairwise / tee | ✅ |
 
 ---
 
 ## 第四阶段：标准库 `04_stdlib/`
 
-**已完成**：
+只保留 5 个高频模块；`itertools` 归入第三阶段的迭代器专题，`datetime` / `re` 用到再查。
 
-| 文件 | 内容 | 行数 |
-|---|---|---|
-| 02_itertools.py | 迭代工具、排列组合、无限迭代器 | 260 |
-
-**大纲待补**（目前只有知识点清单）：`01_collections.py`、`03_functools.py`、`04_pathlib.py`、`05_datetime.py`、`06_regex.py`、`07_json_csv.py`、`08_logging.py`。
+| # | 文件 | 内容 | 状态 |
+|---|---|---|---|
+| 01 | 01_collections.py | namedtuple、Counter、defaultdict、deque、OrderedDict、ChainMap + 日志分析实战 | ✅ 7 个案例 |
+| 02 | 02_functools.py | lru_cache、cached_property、partial、wraps、singledispatch、total_ordering、cmp_to_key、reduce | ✅ 9 个案例 |
+| 03 | 03_pathlib.py | 现代路径操作 | 📝 待补 |
+| 04 | 04_json_csv.py | JSON / CSV 序列化 | 📝 待补 |
+| 05 | 05_logging.py | 日志模块 | 📝 待补 |
 
 > 迭代器协议与上下文管理器属于语言特性，已归入 [`03_advanced/`](03_advanced/)（`11_iterator.py`、`12_context_manager.py`）。
 

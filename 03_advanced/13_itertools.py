@@ -4,8 +4,8 @@ itertools 模块 —— 高效的迭代器工具集
 全部惰性求值：用到一个产一个，内存占用极低。
 
 【运行方式】
-  全部: python itertools_demo.py
-  单个: python itertools_demo.py infinite / terminating / combining / grouping / slicing / pairwise / tee / use_cases
+  全部: python 13_itertools.py
+  单个: python 13_itertools.py infinite / terminating / combining / grouping / slicing / pairwise / tee / use_cases
 """
 
 import itertools
