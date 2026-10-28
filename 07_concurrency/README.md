@@ -2,6 +2,8 @@
 
 学习顺序、核心概念、选型决策树见 [concurrency_roadmap.md](concurrency_roadmap.md)。
 
+配套长文教程：[docs/并发编程.md](docs/并发编程.md)（11 章，每章按「为什么 → 概念 → 案例 → 误区 → 总结」展开，含运行结果与面试问答）
+
 | # | 文件 | 内容 | 状态 |
 |---|---|---|---|
 | 01 | 01_concept.py | 并发 vs 并行、GIL、I/O密集 vs CPU密集 | ✅ 有案例 |
