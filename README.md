@@ -1,18 +1,25 @@
 # Python 学习路线
 
+> 本仓库只放 **Python 语言本身**：基础语法 → 面向对象 → 进阶特性 → 标准库 → 工程化 → 并发编程。
+> 后端方向（FastAPI、MySQL）的笔记已拆分到独立目录 `D:\github_repository\Backend-notes`。
+
 ## 目录结构
 
 ```
-d:\python_learn\
+python-notes/
 ├── 01_basic/          # 第一阶段：基础语法
 ├── 02_oop/            # 第二阶段：面向对象
 ├── 03_advanced/       # 第三阶段：进阶特性（魔术方法）
 ├── 04_stdlib/         # 第四阶段：标准库
-├── 05_tooling/        # 第五阶段：工程化
-├── 06_web/            # 第六阶段：Web 开发
-├── 07_concurrency/    # 第七阶段：并发编程（线程/进程/协程/锁）
+├── 05_tooling/        # 第五阶段：工程化（venv / pytest / 类型注解）
+├── 07_concurrency/    # 第七阶段：并发编程（线程/进程/协程/锁 + 完整长文）
+├── projects/          # 练习项目（成绩管理 CLI + pytest）
+├── python-agent/      # Agent 工具注册表小实验
+├── E_S_Docs/          # 面试八股整理
 └── README.md          # 本文件
 ```
+
+> 原第六阶段（Web 开发 `06_web/`）与 `MySQL/` 已迁出，见 Backend-notes。
 
 ---
 
@@ -114,7 +121,7 @@ d:\python_learn\
 
 ## 学习建议
 
-1. **按阶段顺序学**：01_basic → 02_oop → 03_advanced → 04_stdlib → 05_tooling → 06_web → 07_concurrency
+1. **按阶段顺序学**：01_basic → 02_oop → 03_advanced → 04_stdlib → 05_tooling → 07_concurrency（Web / MySQL 已拆到 Backend-notes）
 2. **基础不牢别跳**：阶段一不熟就不要进阶段二
 3. **OOP 是分水岭**：阶段二是最重要的过渡，类理解透了后面魔术方法才学得懂
 4. **每个文件独立可运行**：学完一个跑通一个，看到输出才算过
