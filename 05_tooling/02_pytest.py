@@ -249,7 +249,7 @@ def test_average_parametrize(scores, expected_avg):
 # - 测试文件的放法: 和代码放一起, 或在 tests/ 目录下
 """
 推荐目录结构:
-  projects/grade_system/
+  grade_system/
   ├── models.py
   ├── main.py
   ├── storage.py

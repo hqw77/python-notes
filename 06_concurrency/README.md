@@ -1,4 +1,4 @@
-# 并发编程 `07_concurrency/`
+# 并发编程 `06_concurrency/`
 
 学习顺序、核心概念、选型决策树见 [concurrency_roadmap.md](concurrency_roadmap.md)。
 
@@ -42,13 +42,13 @@
 
 ```bash
 # 跑该文件全部案例
-python 07_concurrency/03_lock.py
+python 06_concurrency/03_lock.py
 
 # 只跑其中一个案例（例：死锁）
-python 07_concurrency/03_lock.py deadlock
+python 06_concurrency/03_lock.py deadlock
 
 # 不知道有哪些案例，随便传个不存在的名字会列出可选列表
-python 07_concurrency/03_lock.py xxx
+python 06_concurrency/03_lock.py xxx
 ```
 
 各文件可选的案例名，见每个文件顶部 docstring 里的【运行方式】。

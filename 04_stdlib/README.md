@@ -28,4 +28,4 @@ if __name__ == "__main__":
     ...
 ```
 
-参考 `07_concurrency/` 里已经成型的样子。
+参考 `06_concurrency/` 里已经成型的样子。
