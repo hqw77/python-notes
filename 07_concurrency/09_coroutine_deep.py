@@ -1,32 +1,6 @@
 """
 协程进阶 —— asyncio 生态 + 与线程/进程混用
 
-【前置: 先学完 03_advanced/10_async_basics.py】
-
-  那里讲了 async/await 基础、asyncio.run、gather、async for/with。
-  这里讲三件进阶的事:
-    1. asyncio 的更多调度工具 (as_completed / timeout)
-    2. 协程里调"阻塞函数"怎么办 → asyncio.to_thread / run_in_executor
-    3. 协程、线程、进程三者怎么混用
-
-【核心概念】
-
-  ┌──────────────────────────┬────────────────────────────────────┐
-  │ 工具                      │ 作用                                │
-  ├──────────────────────────┼────────────────────────────────────┤
-  │ asyncio.as_completed()   │ 谁先完成先处理谁                     │
-  │ asyncio.timeout()        │ 给一段协程设超时 (3.11+)            │
-  │ asyncio.to_thread()      │ 把阻塞函数丢到线程池跑 (不阻塞事件循环)│
-  │ loop.run_in_executor()   │ 同上, 可指定线程池/进程池            │
-  └──────────────────────────┴────────────────────────────────────┘
-
-【协程最大的坑: 阻塞调用会卡死整个事件循环】
-
-  async def 里如果调用了 time.sleep() 或 requests.get() 这类"阻塞"函数,
-  整个事件循环都会被卡住, 其他协程全没法跑。
-  → 正确做法: 用 asyncio.sleep() (非阻塞), 或用 asyncio.to_thread()
-    把阻塞函数丢到线程池去跑。
-
 【运行方式】
   全部: python 09_coroutine_deep.py
   单个: python 09_coroutine_deep.py completed / timeout / to_thread / bug / executor
