@@ -25,6 +25,16 @@ Thumbs.db
 # Jupyter
 .ipynb_checkpoints/
 
+# Test / coverage caches
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local SQLite databases (由代码运行时自动创建)
+*.db
+*.sqlite3
+*.db-journal
+
 # Env / secrets
 .env
 .env.*
